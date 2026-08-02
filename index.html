@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>物竞天择 · 物理竞赛薄弱点智能管理系统</title>
+<script>/* 主题防闪烁：在首帧 CSS 生效前同步读取主题 */
+try{var t=localStorage.getItem('physics_wp_theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<!-- ⚠️ 建议为上述 CDN 补充 SRI integrity 哈希（需与文件实际哈希一致，这里不伪造），并考虑本地打包以防离线 -->
 <style>
 /* ================= 主题变量 ================= */
 :root{
@@ -598,11 +601,11 @@ img{user-select:none}
 </div>
 
 <!-- ============ 编辑模态框 ============ -->
-<div class="modal-mask" id="editModal">
+<div class="modal-mask" id="editModal" role="dialog" aria-modal="true" aria-label="编辑薄弱点">
   <div class="modal wide">
     <div class="modal-head">
       <div class="modal-title" id="editModalTitle">📝 录入薄弱点</div>
-      <button class="modal-close" onclick="App.closeEditModal()">✕</button>
+      <button class="modal-close" onclick="App.closeEditModal()" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -616,7 +619,7 @@ img{user-select:none}
         </div>
         <div class="form-row">
           <div class="form-label">难度等级</div>
-          <div class="star-input" id="starInput"></div>
+          <div class="star-input" id="starInput" role="radiogroup" aria-label="难度等级"></div>
         </div>
       </div>
       <div class="form-row">
@@ -649,8 +652,8 @@ img{user-select:none}
         <div class="attach-head">📝 试题附件 <span class="cnt" id="qCount"></span>
           <span class="ah-ops">
             <button class="paste-tag" id="ptagQ" title="设为 Ctrl+V 粘贴目标" onclick="App.setPasteBucket('questions')">📋 粘贴至此</button>
-            <button class="mini-btn" title="拍照上传（移动端）" onclick="document.getElementById('fileQCam').click()">📷</button>
-            <button class="mini-btn del" title="清空全部附件" onclick="App.clearDraft('questions')">🗑️</button>
+            <button class="mini-btn" title="拍照上传（移动端）" aria-label="拍照上传" onclick="document.getElementById('fileQCam').click()">📷</button>
+            <button class="mini-btn del" title="清空全部附件" aria-label="清空试题附件" onclick="App.clearDraft('questions')">🗑️</button>
           </span>
         </div>
         <div class="dropzone" id="dropQ" onclick="App.setPasteBucket('questions');document.getElementById('fileQ').click()">
@@ -666,8 +669,8 @@ img{user-select:none}
         <div class="attach-head">✅ 答案附件 <span class="cnt" id="aCount"></span>
           <span class="ah-ops">
             <button class="paste-tag" id="ptagA" title="设为 Ctrl+V 粘贴目标" onclick="App.setPasteBucket('answers')">📋 粘贴至此</button>
-            <button class="mini-btn" title="拍照上传（移动端）" onclick="document.getElementById('fileACam').click()">📷</button>
-            <button class="mini-btn del" title="清空全部附件" onclick="App.clearDraft('answers')">🗑️</button>
+            <button class="mini-btn" title="拍照上传（移动端）" aria-label="拍照上传" onclick="document.getElementById('fileACam').click()">📷</button>
+            <button class="mini-btn del" title="清空全部附件" aria-label="清空答案附件" onclick="App.clearDraft('answers')">🗑️</button>
           </span>
         </div>
         <div class="dropzone" id="dropA" onclick="App.setPasteBucket('answers');document.getElementById('fileA').click()">
@@ -687,11 +690,11 @@ img{user-select:none}
 </div>
 
 <!-- ============ PDF 导入模态框 ============ -->
-<div class="modal-mask" id="pdfModal" style="z-index:330">
+<div class="modal-mask" id="pdfModal" style="z-index:330" role="dialog" aria-modal="true" aria-label="导入 PDF">
   <div class="modal" style="max-width:460px">
     <div class="modal-head">
       <div class="modal-title">📕 导入 PDF</div>
-      <button class="modal-close" onclick="App.closePdfModal()">✕</button>
+      <button class="modal-close" onclick="App.closePdfModal()" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body">
       <div class="pdf-info" id="pdfInfo"></div>
@@ -717,22 +720,22 @@ img{user-select:none}
 </div>
 
 <!-- ============ 详情模态框 ============ -->
-<div class="modal-mask" id="detailModal">
+<div class="modal-mask" id="detailModal" role="dialog" aria-modal="true" aria-label="薄弱点详情">
   <div class="modal wide">
     <div class="modal-head">
       <div class="modal-title">🔍 薄弱点详情</div>
-      <button class="modal-close" onclick="App.closeDetail()">✕</button>
+      <button class="modal-close" onclick="App.closeDetail()" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body" id="detailBody"></div>
   </div>
 </div>
 
 <!-- ============ SM-2 自评模态框 ============ -->
-<div class="modal-mask" id="gradeModal" style="z-index:320">
+<div class="modal-mask" id="gradeModal" style="z-index:320" role="dialog" aria-modal="true" aria-label="复习自评">
   <div class="modal" style="max-width:500px">
     <div class="modal-head">
       <div class="modal-title">🎯 复习自评 · SM-2</div>
-      <button class="modal-close" onclick="App.closeGradeModal()">✕</button>
+      <button class="modal-close" onclick="App.closeGradeModal()" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body">
       <div id="gradeTitle" style="font-size:16px;font-weight:900;line-height:1.5;margin-bottom:6px"></div>
@@ -747,11 +750,11 @@ img{user-select:none}
 </div>
 
 <!-- ============ 打印设计器 ============ -->
-<div class="modal-mask" id="printModal">
+<div class="modal-mask" id="printModal" role="dialog" aria-modal="true" aria-label="打印设计器">
   <div class="modal xwide">
     <div class="modal-head">
       <div class="modal-title">🖨️ 打印设计器</div>
-      <button class="modal-close" onclick="App.closePrintModal()">✕</button>
+      <button class="modal-close" onclick="App.closePrintModal()" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body">
       <div class="print-designer">
@@ -826,7 +829,7 @@ img{user-select:none}
 </div>
 
 <!-- ============ 确认框 ============ -->
-<div class="modal-mask" id="confirmModal" style="z-index:300">
+<div class="modal-mask" id="confirmModal" style="z-index:300" role="dialog" aria-modal="true" aria-label="确认操作">
   <div class="modal" style="max-width:400px">
     <div class="modal-body" style="padding-top:28px;text-align:center">
       <div style="font-size:40px;margin-bottom:12px">⚠️</div>
@@ -840,11 +843,11 @@ img{user-select:none}
 </div>
 
 <!-- ============ 输入框 ============ -->
-<div class="modal-mask" id="inputModal" style="z-index:340">
+<div class="modal-mask" id="inputModal" style="z-index:340" role="dialog" aria-modal="true" aria-label="输入">
   <div class="modal" style="max-width:380px">
     <div class="modal-head">
       <div class="modal-title" id="inputTitle">输入</div>
-      <button class="modal-close" onclick="App.closeInputModal(false)">✕</button>
+      <button class="modal-close" onclick="App.closeInputModal(false)" aria-label="关闭">✕</button>
     </div>
     <div class="modal-body">
       <input class="form-input" id="inputField" onkeydown="if(event.key==='Enter')App.closeInputModal(true)">
@@ -856,14 +859,14 @@ img{user-select:none}
   </div>
 </div>
 
-<div id="lightbox" onclick="if(event.target===this)App.closeLightbox()">
-  <button class="lb-nav lb-prev" id="lbPrev" onclick="event.stopPropagation();App.lbNav(-1)">‹</button>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" onclick="if(event.target===this)App.closeLightbox()">
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="上一张" onclick="event.stopPropagation();App.lbNav(-1)">‹</button>
   <img id="lightboxImg" onclick="event.stopPropagation()">
-  <button class="lb-nav lb-next" id="lbNext" onclick="event.stopPropagation();App.lbNav(1)">›</button>
+  <button class="lb-nav lb-next" id="lbNext" aria-label="下一张" onclick="event.stopPropagation();App.lbNav(1)">›</button>
   <div id="lbCount"></div>
-  <button class="lb-close" onclick="event.stopPropagation();App.closeLightbox()">✕</button>
+  <button class="lb-close" onclick="event.stopPropagation();App.closeLightbox()" aria-label="关闭">✕</button>
 </div>
-<div id="toastContainer"></div>
+<div id="toastContainer" aria-live="polite"></div>
 <div id="heatTip"></div>
 <div id="printArea"></div>
 
@@ -890,8 +893,16 @@ const MATURE_IVL = 21;
 const DAY = 86400000;
 const STORE_KEY = 'physics_wp_v2';
 const THEME_KEY = 'physics_wp_theme';
+// 具名魔法常量
+const MASTERY_BASE = 61;
+const HEAT_LEVELS = [2, 4, 6];
+const PDF_EST_BYTES_PER_PX = 95;
+const MAX_CANVAS_PIXELS = 16.8e6;
 
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const uid = () => {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g, '');
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+};
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateKey = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 const keyToTime = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d).getTime(); };
@@ -908,36 +919,51 @@ const fmtBytes = b => b >= 1073741824 ? (b/1073741824).toFixed(2) + ' GB'
 const b64len = u => Math.max(0, Math.round((u.length - u.indexOf(',') - 1) * 3 / 4));
 const fileSize = f => f.type === 'pdf' ? f.pages.reduce((s,p) => s + b64len(p), 0) : b64len(f.dataUrl);
 const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
+const structClone = v => (window.structuredClone ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
 
 /* ============================================================
-   存储引擎：IndexedDB（大容量）
+   存储引擎：IndexedDB（元数据 + 附件 Blob 分离）
 ============================================================ */
 const IDB_NAME = 'physics_trainer_idb';
 const IDB_STORE = 'kv';
+const IDB_FILES = 'files';
+const IDB_VERSION = 2;
 let idbAvailable = true;
 let _idbPromise = null;
 let lsFallbackNotified = false;
+let pendingBlobIds = new Set();
+let knownFileIds = new Set();
 
 function idbOpen(){
   if (_idbPromise) return _idbPromise;
   _idbPromise = new Promise((res, rej) => {
     if (!window.indexedDB) return rej(new Error('IndexedDB 不可用'));
-    const rq = indexedDB.open(IDB_NAME, 1);
+    const rq = indexedDB.open(IDB_NAME, IDB_VERSION);
     rq.onupgradeneeded = () => {
       if (!rq.result.objectStoreNames.contains(IDB_STORE)) rq.result.createObjectStore(IDB_STORE);
+      if (!rq.result.objectStoreNames.contains(IDB_FILES)) rq.result.createObjectStore(IDB_FILES);
     };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
   });
   return _idbPromise;
 }
-async function idbGet(key){
-  const db = await idbOpen();
-  return new Promise((res, rej) => {
-    const rq = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
-    rq.onsuccess = () => res(rq.result);
-    rq.onerror = () => rej(rq.error);
-  });
+async function idbGet(key, _attempt = 1){
+  try{
+    const db = await idbOpen();
+    return await new Promise((res, rej) => {
+      const rq = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => rej(rq.error);
+    });
+  }catch(e){
+    /* P1-9g：首次读失败重试一次（应对隐私模式抖动），仍失败才抛错 */
+    if (_attempt < 2){
+      _idbPromise = null;  // 重置连接缓存，重建
+      return idbGet(key, _attempt + 1);
+    }
+    throw e;
+  }
 }
 async function idbSet(key, val){
   const db = await idbOpen();
@@ -948,30 +974,106 @@ async function idbSet(key, val){
     tx.onerror = () => rej(tx.error);
   });
 }
-const store = {
-  async get(key){
-    if (idbAvailable){
-      try{ return await idbGet(key); }
-      catch(e){ console.warn('IndexedDB 读取失败，降级 localStorage', e); idbAvailable = false; }
-    }
-    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : undefined; }
-    catch(e){ return undefined; }
-  },
-  async set(key, val){
-    if (idbAvailable){
-      try{ await idbSet(key, val); return 'idb'; }
-      catch(e){ console.warn('IndexedDB 写入失败，降级 localStorage', e); idbAvailable = false; }
-    }
-    localStorage.setItem(key, JSON.stringify(val));
-    return 'ls';
+async function idbPutBlob(id, val){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_FILES, 'readwrite');
+    tx.objectStore(IDB_FILES).put(val, id);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbDeleteBlob(id){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_FILES, 'readwrite');
+    tx.objectStore(IDB_FILES).delete(id);
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbGetMany(ids){
+  if (!ids.length) return {};
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(IDB_FILES, 'readonly');
+    const store = tx.objectStore(IDB_FILES);
+    const out = {};
+    ids.forEach(k => { const rq = store.get(k); rq.onsuccess = () => { if (rq.result) out[k] = rq.result; }; });
+    tx.oncomplete = () => res(out);
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
+/* 元数据（不含 base64 数据，仅引用） */
+function buildMeta(db){
+  const ref = f => f && f.id ? ({
+    id: f.id, type: f.type, name: f.name,
+    pageCount: f.type === 'pdf' ? (f.pageCount || 0) : undefined,
+    srcPages: f.type === 'pdf' ? (f.srcPages || f.pageCount || 0) : undefined
+  }) : null;
+  return {
+    ...db,
+    weakPoints: db.weakPoints.map(wp => ({
+      ...wp,
+      questions: (wp.questions || []).map(ref).filter(Boolean),
+      answers: (wp.answers || []).map(ref).filter(Boolean)
+    }))
+  };
+}
+function collectFiles(db){
+  const map = {};
+  db.weakPoints.forEach(wp => {
+    [...(wp.questions || []), ...(wp.answers || [])].forEach(f => {
+      if (!f || !f.id) return;
+      if (f.type === 'pdf' && Array.isArray(f.pages)) map[f.id] = { id: f.id, pages: f.pages };
+      else if (f.type === 'image' && typeof f.dataUrl === 'string') map[f.id] = { id: f.id, dataUrl: f.dataUrl };
+    });
+  });
+  return map;
+}
+function allFileIds(db){
+  const s = new Set();
+  db.weakPoints.forEach(wp => [...(wp.questions || []), ...(wp.answers || [])].forEach(f => f && f.id && s.add(f.id)));
+  return s;
+}
+async function hydrateFiles(db){
+  if (!idbAvailable) return db;
+  const refs = [];
+  db.weakPoints.forEach(wp => { [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => refs.push(f)); });
+  const blobs = await idbGetMany([...new Set(refs.map(r => r.id))]);
+  refs.forEach(f => {
+    const b = blobs[f.id];
+    if (!b) return;
+    if (f.type === 'pdf'){ f.pages = b.pages; f.pageCount = b.pages.length; f.srcPages = f.srcPages || b.pages.length; }
+    else f.dataUrl = b.dataUrl;
+  });
+  return db;
+}
+async function flushBlobs(){
+  if (!pendingBlobIds.size) return;
+  const map = collectFiles(DB);
+  for (const id of pendingBlobIds){
+    const f = map[id];
+    if (f){ await idbPutBlob(id, f); knownFileIds.add(id); }
+    pendingBlobIds.delete(id);
   }
-};
+}
+async function cleanupBlobs(){
+  const map = collectFiles(DB);
+  for (const id of [...knownFileIds]){
+    if (!map[id]){ try{ await idbDeleteBlob(id); }catch(_){} knownFileIds.delete(id); }
+  }
+}
 
 /* ============================================================
    SM-2 核心算法
 ============================================================ */
 function newSM2(){ return { ef:2.5, ivl:0, reps:0, due:Date.now(), total:0, lapses:0 }; }
 
+/* 注意：g=1「困难」为标准 SM-2 的刻意变体——
+   这里不重置 reps（标准实现中 quality<3 会重置），而是加强间隔，
+   更贴近"难度较高但已掌握"的场景。如需严格 SM-2 请删除 reps+1 改为 0。 */
 function sm2Step(st, g){
   const ef = st.ef, ivl = st.ivl, reps = st.reps;
   if (g === 0)
@@ -983,7 +1085,8 @@ function sm2Step(st, g){
   return { ef: ef + .15, ivl: reps === 0 ? 4 : Math.max(2, Math.round(ivl * ef * 1.3)), reps: reps + 1 };
 }
 
-const isDue = wp => wp.sm2.due <= Date.now();
+/* 统一"到期"口径为自然日：今天 23:59:59 前到期的卡都算待复习 */
+const isDue = wp => wp.sm2.due <= todayEnd();
 function statusOf(wp){
   if (isDue(wp)) return 'due';
   if (wp.sm2.ivl >= MATURE_IVL) return 'mastered';
@@ -991,7 +1094,7 @@ function statusOf(wp){
   return 'new';
 }
 const masteryOf = wp => wp.sm2.ivl >= 60 ? 100
-  : Math.round(100 * Math.log(1 + wp.sm2.ivl) / Math.log(61));
+  : Math.round(100 * Math.log(1 + wp.sm2.ivl) / Math.log(MASTERY_BASE));
 const pageCount = files => files.reduce((n,f) => n + (f.type === 'pdf' ? f.pages.length : 1), 0);
 
 /* ============================================================
@@ -1026,34 +1129,93 @@ function backfillActivity(){
 
 let DB = null;
 
-async function loadData(){
-  let legacy = false, data;
-  data = await store.get(STORE_KEY);
-  if (!data){
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw){ data = JSON.parse(raw); legacy = true; }
-    }catch(e){}
-  }
-  return { data, legacy };
+/* 导入白名单清洗（防存储型 XSS） */
+const OK_DATAURL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const OK_STR = v => typeof v === 'string' ? v.slice(0, 5000) : '';
+const OK_ID = v => /^[a-z0-9]+$/i.test(v) ? v : uid();
+function sanitizeFile(f){
+  if (!f || typeof f !== 'object') return null;
+  const id = OK_ID(f.id), name = String(OK_STR(f.name) || '附件').slice(0, 150);
+  if (f.type === 'image' && typeof f.dataUrl === 'string' && OK_DATAURL.test(f.dataUrl))
+    return { id, type: 'image', name, dataUrl: f.dataUrl };
+  if (f.type === 'pdf' && Array.isArray(f.pages) && f.pages.length && f.pages.every(s => OK_DATAURL.test(s)))
+    return { id, type: 'pdf', name, pages: f.pages, pageCount: f.pages.length,
+             srcPages: Math.max(1, Math.min(f.pages.length, +f.srcPages || f.pages.length)) };
+  return null;
+}
+function sanitizeWP(wp){
+  return {
+    id: OK_ID(wp && wp.id),
+    title: String(OK_STR(wp && wp.title)).slice(0, 200),
+    category: CATEGORIES[wp && wp.category] ? wp.category : '其他',
+    difficulty: Math.min(5, Math.max(1, +((wp && wp.difficulty) || 3))),
+    description: OK_STR(wp && wp.description),
+    createdAt: +((wp && wp.createdAt) || Date.now()),
+    questions: ((wp && wp.questions) || []).map(sanitizeFile).filter(Boolean),
+    answers: ((wp && wp.answers) || []).map(sanitizeFile).filter(Boolean),
+    sm2: {
+      ef: Math.min(5, Math.max(1.3, +(((wp && wp.sm2 && wp.sm2.ef) || 2.5)))),
+      ivl: Math.max(0, Math.round(+((wp && wp.sm2 && wp.sm2.ivl) || 0))),
+      reps: Math.max(0, Math.round(+((wp && wp.sm2 && wp.sm2.reps) || 0))),
+      due: +((wp && wp.sm2 && wp.sm2.due) || Date.now()),
+      total: Math.max(0, Math.round(+((wp && wp.sm2 && wp.sm2.total) || 0))),
+      lapses: Math.max(0, Math.round(+((wp && wp.sm2 && wp.sm2.lapses) || 0)))
+    },
+    history: ((wp && wp.history) || []).filter(h => h && typeof h.at === 'number')
+      .map(h => ({
+        at: h.at,
+        /* 修复：g=0（"忘记"）不能被 || 覆盖成 2 */
+        g: Math.min(3, Math.max(0, Number.isFinite(+h.g) ? +h.g : 2)),
+        ivl: Math.max(0, +h.ivl || 0), ef: +h.ef || 2.5
+      }))
+  };
 }
 
-function saveDB(){
+async function loadData(){
+  let legacy = false, data, idbMode = false;
+  if (idbAvailable){
+    try{
+      data = await idbGet(STORE_KEY);
+      if (data && Array.isArray(data.weakPoints)){ data = await hydrateFiles(data); idbMode = true; }
+    }catch(e){
+      /* P1-9g 补充：真正失败后提示降级，且明确告知（含重试已在上层 idbGet 处理） */
+      console.warn('IndexedDB 读取失败，降级 localStorage', e);
+      idbAvailable = false;
+    }
+  }
+  if (!data || !Array.isArray(data.weakPoints)){
+    try{ const raw = localStorage.getItem(STORE_KEY); if (raw){ data = JSON.parse(raw); legacy = true; } }catch(e){}
+  }
+  return { data, legacy, idbMode };
+}
+
+async function saveDB(){
   try{ localStorage.setItem(THEME_KEY, DB.settings.theme); }catch(e){}
-  return store.set(STORE_KEY, DB)
-    .then(mode => {
-      if (mode === 'ls' && !lsFallbackNotified){
-        lsFallbackNotified = true;
-        toast('⚠️ 当前浏览器不支持大容量存储，已回退兼容模式（约 5MB），建议更换现代浏览器', 'warn', 5000);
-      }
-      renderStorage();
-      return mode;
-    })
-    .catch(e => {
-      console.error(e);
-      toast('⚠️ 保存失败：存储空间不足！请「导出」备份后删除部分附件', 'error', 5000);
-      return 'err';
-    });
+  let mode = 'ls';
+  if (idbAvailable){
+    try{
+      await idbSet(STORE_KEY, buildMeta(DB));
+      await flushBlobs();
+      await cleanupBlobs();
+      mode = 'idb';
+    }catch(e){
+      console.warn('IndexedDB 写入失败，降级 localStorage', e);
+      idbAvailable = false;
+    }
+  }
+  if (mode === 'ls' && !lsFallbackNotified){
+    lsFallbackNotified = true;
+    toast('⚠️ 当前浏览器不支持大容量存储，已回退兼容模式（约 5MB），建议更换现代浏览器', 'warn', 5000);
+  }
+  try{
+    if (mode === 'ls') localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+  }catch(e){
+    console.error(e);
+    toast('⚠️ 保存失败：存储空间不足！请「导出」备份后删除部分附件', 'error', 5000);
+    return 'err';
+  }
+  renderStorage();
+  return mode;
 }
 
 function logActivity(){
@@ -1079,7 +1241,7 @@ function calcStreak(){
 /* ============================================================
    UI 状态
 ============================================================ */
-let ui = { view:'dashboard', selectMode:false, selected:[], filterCat:'all',
+let ui = { view:'dashboard', selectMode:false, selected:[], selBackup:null, filterCat:'all',
   editingId:null, difficulty:3, detailId:null, gradingId:null, heatWeeks:26,
   pasteBucket:'questions', upload:{maxRes:1800, quality:.85, pdfScale:2},
   detailGalleries:{questions:[],answers:[]} };
@@ -1106,8 +1268,12 @@ function switchView(v){
 /* ============================================================
    渲染：总调度
 ============================================================ */
+let _lastStorageRender = 0;
 function renderAll(){
-  renderDueBadge(); renderStorage();
+  renderDueBadge();
+  /* P2：同一事件循环内多次 renderAll 只触发一次存储计量，避免重复 estimate() */
+  const now = Date.now();
+  if (now - _lastStorageRender > 500){ renderStorage(); _lastStorageRender = now; }
   if (ui.view === 'dashboard') renderDashboard();
   else if (ui.view === 'library') renderLibrary();
   else if (ui.view === 'review') renderReview();
@@ -1170,7 +1336,7 @@ function heatmapHTML(weeks, mini){
     const t = addDays(start, i);
     if (t > t0){ cells += '<span class="heat-cell hc-future"></span>'; continue; }
     const n = DB.activity[dateKey(new Date(t))] || 0;
-    const lv = n === 0 ? 0 : n <= 2 ? 1 : n <= 4 ? 2 : n <= 6 ? 3 : 4;
+    const lv = n === 0 ? 0 : n <= HEAT_LEVELS[0] ? 1 : n <= HEAT_LEVELS[1] ? 2 : n <= HEAT_LEVELS[2] ? 3 : 4;
     cells += `<span class="heat-cell lv${lv}" data-tip="${n} 次复习 · ${fmtFull(t)}"></span>`;
   }
   let months = '';
@@ -1199,6 +1365,7 @@ document.addEventListener('mousemove', e => {
   heatTip.style.display = 'block';
   heatTip.style.left = Math.min(e.clientX + 12, window.innerWidth - 180) + 'px';
   heatTip.style.top = Math.max(8, e.clientY - 38) + 'px';
+  if (!e.target.closest('.heat-cell')) heatTip.style.display = 'none';
 });
 
 /* ============================================================
@@ -1239,7 +1406,7 @@ function renderDashboard(){
   document.getElementById('recentList').innerHTML = recent.length
     ? recent.map(wp => { const c = catOf(wp.category); return `
       <div class="review-item" style="cursor:pointer" onclick="App.openDetail('${wp.id}')">
-        <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+        <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
         <div class="rv-info"><div class="rv-title" style="font-size:13.5px">${esc(wp.title)}</div>
         <div class="rv-sub">录入于 ${fmtFull(wp.createdAt)} · 掌握度 ${masteryOf(wp)}%</div></div>
       </div>`; }).join('')
@@ -1296,10 +1463,13 @@ function cardHTML(wp){
     ? `<span class="next-due due">⚡ ${wp.sm2.total ? '复习到期' : '首次学习待进行'}</span>`
     : `<span class="next-due ${st==='mastered'?'ok':''}">${st==='mastered' ? '🏆 熟练 · ' : ''}下次复习 ${fmtDate(wp.sm2.due)}</span>`;
   return `
-  <div class="wp-card ${selected?'selected':''} ${st==='due'?'is-due':''}" onclick="App.cardClick('${wp.id}')">
+  <div class="wp-card ${selected?'selected':''} ${st==='due'?'is-due':''}"
+       tabindex="0" role="button" aria-label="${esc(wp.title)}"
+       onclick="App.cardClick('${wp.id}')"
+       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.cardClick('${wp.id}')}">
     <div class="sel-check"></div>
     <div class="wp-top">
-      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
       ${starsHTML(wp.difficulty)}
       ${st==='due' ? '<span class="badge" style="background:rgba(244,63,94,.12);color:#f43f5e">待复习</span>' : ''}
       ${st==='mastered' ? '<span class="badge" style="background:rgba(16,185,129,.12);color:#10b981">已熟练</span>' : ''}
@@ -1318,8 +1488,8 @@ function cardHTML(wp){
     <div class="wp-actions" onclick="event.stopPropagation()">
       ${due ? `<button class="btn btn-success btn-sm" onclick="App.openGradeModal('${wp.id}')">✓ 完成复习</button>` : ''}
       <button class="btn btn-ghost btn-sm" onclick="App.openDetail('${wp.id}')">详情</button>
-      <button class="mini-btn" title="编辑" onclick="App.openEditModal('${wp.id}')">✏️</button>
-      <button class="mini-btn del" title="删除" onclick="App.deleteWP('${wp.id}')">🗑️</button>
+      <button class="mini-btn" title="编辑" aria-label="编辑" onclick="App.openEditModal('${wp.id}')">✏️</button>
+      <button class="mini-btn del" title="删除" aria-label="删除" onclick="App.deleteWP('${wp.id}')">🗑️</button>
     </div>
   </div>`;
 }
@@ -1341,16 +1511,16 @@ function reviewItemHTML(wp, compact){
   const dueTxt = overdue ? `逾期 ${odDays} 天` : (wp.sm2.due <= todayEnd() ? '📌 今天到期' : fmtFull(wp.sm2.due));
   return `
   <div class="review-item ${overdue ? 'overdue' : ''}">
-    <button class="rv-check" title="完成复习并自评" onclick="App.openGradeModal('${wp.id}')">✓</button>
+    <button class="rv-check" title="完成复习并自评" aria-label="完成复习并自评" onclick="App.openGradeModal('${wp.id}')">✓</button>
     <div class="rv-info">
       <div class="rv-title">${esc(wp.title)}
-        <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+        <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
         <span class="rv-stage">${isNew ? '🆕 首次学习' : `第 ${wp.sm2.total + 1} 次 · 间隔 ${fmtIvl(wp.sm2.ivl)} · EF ${wp.sm2.ef.toFixed(2)}`}</span>
       </div>
       ${!compact && wp.description ? `<div class="rv-sub">${esc(wp.description.slice(0, 70))}${wp.description.length>70?'…':''}</div>` : ''}
     </div>
     <span class="rv-due ${overdue ? '' : 'future'}">${dueTxt}</span>
-    <button class="mini-btn" onclick="App.openDetail('${wp.id}')">👁</button>
+    <button class="mini-btn" aria-label="详情" onclick="App.openDetail('${wp.id}')">👁</button>
   </div>`;
 }
 
@@ -1370,10 +1540,10 @@ function renderReview(){
     ? upcoming.map(wp => { const c = catOf(wp.category); return `
       <div class="review-item">
         <div class="rv-info"><div class="rv-title">${esc(wp.title)}
-          <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+          <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
           <span class="rv-stage">间隔 ${fmtIvl(wp.sm2.ivl)}</span></div></div>
         <span class="rv-due future">📅 ${fmtFull(wp.sm2.due)}</span>
-        <button class="mini-btn" onclick="App.openDetail('${wp.id}')">👁</button>
+        <button class="mini-btn" aria-label="详情" onclick="App.openDetail('${wp.id}')">👁</button>
       </div>`; }).join('')
     : '<p style="font-size:13px;color:var(--text2);padding:6px 2px">📅 未来 7 天没有排期</p>';
 }
@@ -1451,7 +1621,10 @@ function openGradeModal(id){
   }).join('');
   document.getElementById('gradeModal').classList.add('open');
 }
-function closeGradeModal(){ document.getElementById('gradeModal').classList.remove('open'); ui.gradingId = null; }
+function closeGradeModal(){
+  document.getElementById('gradeModal').classList.remove('open');
+  ui.gradingId = null;
+}
 
 function applyGrade(g){
   const wp = DB.weakPoints.find(w => w.id === ui.gradingId);
@@ -1491,7 +1664,8 @@ async function resetSchedule(id){
 function buildStarInput(){
   const box = document.getElementById('starInput');
   box.innerHTML = [1,2,3,4,5].map(i =>
-    `<button type="button" class="${i <= ui.difficulty ? 'on' : ''}" onclick="App.setDifficulty(${i})">${i <= ui.difficulty ? '★' : '☆'}</button>`).join('');
+    `<button type="button" role="radio" aria-checked="${i <= ui.difficulty}" aria-label="${i} 星"
+      class="${i <= ui.difficulty ? 'on' : ''}" onclick="App.setDifficulty(${i})">${i <= ui.difficulty ? '★' : '☆'}</button>`).join('');
 }
 function openEditModal(id){
   ui.editingId = id || null;
@@ -1505,7 +1679,7 @@ function openEditModal(id){
     catSel.value = wp.category;
     document.getElementById('f-desc').value = wp.description || '';
     ui.difficulty = wp.difficulty;
-    draft = { questions: JSON.parse(JSON.stringify(wp.questions)), answers: JSON.parse(JSON.stringify(wp.answers)) };
+    draft = { questions: structClone(wp.questions), answers: structClone(wp.answers) };
   } else {
     document.getElementById('editModalTitle').textContent = '📝 录入薄弱点';
     document.getElementById('f-title').value = '';
@@ -1515,6 +1689,7 @@ function openEditModal(id){
   }
   buildStarInput(); syncUploadDOM(); setPasteBucket('questions'); renderDraftThumbs();
   document.getElementById('editModal').classList.add('open');
+  setTimeout(() => { const t = document.getElementById('f-title'); if (t) t.focus(); }, 60);
 }
 function closeEditModal(){ document.getElementById('editModal').classList.remove('open'); }
 
@@ -1530,7 +1705,9 @@ function saveWeakPoint(){
     answers: draft.answers
   };
   if (ui.editingId){
-    Object.assign(DB.weakPoints.find(w => w.id === ui.editingId), data);
+    const wp = DB.weakPoints.find(w => w.id === ui.editingId);
+    if (!wp){ toast('原条目已不存在', 'error'); closeEditModal(); return; }
+    Object.assign(wp, data);
     toast('✅ 修改已保存', 'success');
   } else {
     DB.weakPoints.unshift({ id: uid(), createdAt: Date.now(), sm2: newSM2(), history: [], ...data });
@@ -1545,6 +1722,13 @@ async function deleteWP(id){
   ui.selected = ui.selected.filter(s => s !== id);
   saveDB(); renderAll();
   toast('🗑️ 已删除', 'success');
+}
+
+/* 详情页删除：取消时不要关闭详情 */
+async function deleteFromDetail(id){
+  const before = DB.weakPoints.length;
+  await deleteWP(id);
+  if (DB.weakPoints.length < before) closeDetail();
 }
 
 /* ============================================================
@@ -1587,7 +1771,7 @@ function renderDraftThumbs(){
     document.getElementById(elId).innerHTML = files.map((f, idx) => {
       const start = gi; gi += f.type === 'pdf' ? f.pages.length : 1;
       const inner = f.type === 'image'
-        ? `<img draggable="false" src="${f.dataUrl}" onclick="App.openDraftGallery('${bucket}',${start})">`
+        ? `<img draggable="false" src="${f.dataUrl}" loading="lazy" onclick="App.openDraftGallery('${bucket}',${start})">`
         : `<div class="pdf-cover" onclick="App.openDraftGallery('${bucket}',${start})">
              <span class="big">📕</span><span>PDF</span><span>${f.pageCount} 页</span></div>`;
       return `<div class="thumb" draggable="true" data-bucket="${bucket}" data-idx="${idx}"
@@ -1596,9 +1780,9 @@ function renderDraftThumbs(){
         <span class="ord">${idx + 1}</span>
         <span class="sz">${fmtBytes(fileSize(f))}</span>
         <div class="ops">
-          ${f.type === 'image' ? `<button title="旋转 90°" onclick="event.stopPropagation();App.rotateDraft('${bucket}','${f.id}')">↻</button>` : ''}
-          <button title="重命名" onclick="event.stopPropagation();App.renameDraft('${bucket}','${f.id}')">✏️</button>
-          <button class="del" title="删除" onclick="event.stopPropagation();App.removeDraft('${bucket}','${f.id}')">✕</button>
+          ${f.type === 'image' ? `<button title="旋转 90°" aria-label="旋转" onclick="event.stopPropagation();App.rotateDraft('${bucket}','${f.id}')">↻</button>` : ''}
+          <button title="重命名" aria-label="重命名" onclick="event.stopPropagation();App.renameDraft('${bucket}','${f.id}')">✏️</button>
+          <button class="del" title="删除" aria-label="删除" onclick="event.stopPropagation();App.removeDraft('${bucket}','${f.id}')">✕</button>
         </div>
       </div>`;
     }).join('');
@@ -1647,6 +1831,10 @@ document.addEventListener('dragend', () => {
   document.querySelectorAll('.thumb.dragging,.thumb.dragover').forEach(x => x.classList.remove('dragging','dragover'));
 });
 
+/* 全局拦截文件拖放默认行为，避免丢草稿时浏览器直接导航到文件 */
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+
 /* Ctrl+V 粘贴截图 */
 document.addEventListener('paste', e => {
   if (!document.getElementById('editModal').classList.contains('open')) return;
@@ -1666,15 +1854,17 @@ async function handleFiles(input, bucket){
   for (const file of files){
     try{
       if (file.type.startsWith('image/')){
-        draft[bucket].push(await processImage(file));
+        const f = await processImage(file);
+        draft[bucket].push(f);
+        pendingBlobIds.add(f.id);
         toast(`🖼️ 已添加图片：${file.name || '粘贴的截图'}`, 'success', 1500);
       } else if (file.type === 'application/pdf'){
         if (typeof pdfjsLib === 'undefined'){ toast('PDF 组件未加载（需要联网加载 pdf.js）', 'error'); continue; }
         toast(`⏳ 正在读取 PDF：${file.name} …`, 'info', 1500);
         const buf = await file.arrayBuffer();
         const doc = await pdfjsLib.getDocument({ data: buf }).promise;
-        pendingPdf = { doc, name: file.name, numPages: doc.numPages, bucket };
-        openPdfImport();
+        pdfQueue.push({ doc, name: file.name, numPages: doc.numPages, bucket });
+        openNextPdf();
       } else {
         toast(`不支持的文件类型：${file.name}`, 'error');
       }
@@ -1689,10 +1879,16 @@ function processImage(file){
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const MAX = ui.upload.maxRes, scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const MAX = ui.upload.maxRes;
+        let scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        let w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const area = w * h;
+        if (area > MAX_CANVAS_PIXELS){
+          const s = Math.sqrt(MAX_CANVAS_PIXELS / area);
+          w = Math.round(w * s); h = Math.round(h * s);
+        }
         const cv = document.createElement('canvas');
-        cv.width = Math.round(img.width * scale);
-        cv.height = Math.round(img.height * scale);
+        cv.width = w; cv.height = h;
         const ctx = cv.getContext('2d');
         ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
         ctx.drawImage(img, 0, 0, cv.width, cv.height);
@@ -1705,11 +1901,20 @@ function processImage(file){
   });
 }
 
-/* ---- PDF 导入（选页 + 清晰度） ---- */
+/* ---- PDF 导入（选页 + 清晰度 + 队列） ---- */
+let pdfQueue = [];
 let pendingPdf = null;
-function openPdfImport(){
-  if (!pendingPdf) return;
-  document.getElementById('pdfInfo').innerHTML = `📕 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(pendingPdf.name)}</span><span style="margin-left:auto;flex:none;color:var(--text2);font-weight:600">共 ${pendingPdf.numPages} 页</span>`;
+let pdfAbandonAll = false;   // 标记"全部放弃"：ESC/遮罩关闭时不再弹出下一个
+
+function openNextPdf(){
+  if (pendingPdf && document.getElementById('pdfModal').classList.contains('open')) return;
+  if (!pdfQueue.length){ document.getElementById('pdfModal').classList.remove('open'); return; }
+  pdfAbandonAll = false;
+  pendingPdf = pdfQueue[0];
+  const p = pendingPdf;
+  document.getElementById('pdfInfo').innerHTML =
+    `📕 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span>` +
+    `<span style="margin-left:auto;flex:none;color:var(--text2);font-weight:600">共 ${p.numPages} 页${pdfQueue.length > 1 ? ` · 队列剩余 ${pdfQueue.length - 1} 个` : ''}</span>`;
   document.getElementById('pdf-range').value = '';
   document.getElementById('pdf-scale').value = ui.upload.pdfScale;
   pdfEstUpdate();
@@ -1717,7 +1922,23 @@ function openPdfImport(){
 }
 function closePdfModal(){
   document.getElementById('pdfModal').classList.remove('open');
-  if (pendingPdf){ try{ pendingPdf.doc.destroy(); }catch(_){} pendingPdf = null; }
+  if (pendingPdf){
+    const idx = pdfQueue.indexOf(pendingPdf);
+    if (idx >= 0){ try{ pendingPdf.doc.destroy(); }catch(_){} pdfQueue.splice(idx, 1); }
+    pendingPdf = null;
+  }
+  openNextPdf();  // 有下一个就继续配置，否则停在关闭态
+}
+function closePdfModalCancelAll(){
+  /* 取消本个 + 放弃队列剩余全部 */
+  document.getElementById('pdfModal').classList.remove('open');
+  if (pendingPdf){
+    const idx = pdfQueue.indexOf(pendingPdf);
+    if (idx >= 0){ try{ pendingPdf.doc.destroy(); }catch(_){} pdfQueue.splice(idx, 1); }
+    pendingPdf = null;
+  }
+  pdfQueue.forEach(p => { try{ p.doc.destroy(); }catch(_){} });
+  pdfQueue = [];
 }
 function parsePageRange(str, n){
   str = (str || '').trim();
@@ -1740,7 +1961,7 @@ function pdfEstUpdate(){
   if (!pendingPdf) return;
   const nums = parsePageRange(document.getElementById('pdf-range').value, pendingPdf.numPages);
   const scale = +document.getElementById('pdf-scale').value;
-  const est = nums.length * scale * scale * 95 * 1024;
+  const est = nums.length * scale * scale * PDF_EST_BYTES_PER_PX * 1024;
   document.getElementById('pdf-est').innerHTML =
     `将导入 <b>${nums.length}</b> / ${pendingPdf.numPages} 页 · 预计占用约 <b>${fmtBytes(est)}</b>`;
 }
@@ -1753,9 +1974,11 @@ async function confirmPdfImport(){
   ui.upload.pdfScale = scale;
   DB.settings.upload = ui.upload;
   saveDB();
-  const { doc, name, bucket, numPages } = pendingPdf;
+  const p = pendingPdf;
+  const idx = pdfQueue.indexOf(p);
+  if (idx >= 0) pdfQueue.splice(idx, 1);
   pendingPdf = null;
-  document.getElementById('pdfModal').classList.remove('open');
+  const { doc, name, bucket, numPages } = p;
   const pages = [];
   try{
     for (let k = 0; k < nums.length; k++){
@@ -1769,11 +1992,15 @@ async function confirmPdfImport(){
       pages.push(cv.toDataURL('image/jpeg', ui.upload.quality));
       if ((k+1) % 3 === 0 || k === nums.length - 1) toast(`⏳ PDF 解析中 ${k+1}/${nums.length} 页…`, 'info', 800);
     }
-    draft[bucket].push({ id: uid(), type:'pdf', name, pageCount: pages.length, srcPages: numPages, pages });
+    const newFile = { id: uid(), type:'pdf', name, pageCount: pages.length, srcPages: numPages, pages };
+    draft[bucket].push(newFile);
+    pendingBlobIds.add(newFile.id);
     renderDraftThumbs();
     toast(`📕 已导入 ${pages.length} 页（约 ${fmtBytes(pages.reduce((s,p) => s + b64len(p), 0))}）`, 'success', 3000);
   }catch(e){ console.error(e); toast('PDF 渲染失败', 'error'); }
   try{ doc.destroy(); }catch(_){}
+  openNextPdf();
+  if (!pdfQueue.length) document.getElementById('pdfModal').classList.remove('open');
 }
 
 /* ---- 附件操作 ---- */
@@ -1790,6 +2017,7 @@ async function rotateDraft(bucket, fid){
     ctx.rotate(Math.PI / 2);
     ctx.drawImage(img, -img.width / 2, -img.height / 2);
     f.dataUrl = cv.toDataURL('image/jpeg', ui.upload.quality);
+    pendingBlobIds.add(f.id);
     renderDraftThumbs();
     toast('↻ 已旋转 90°', 'success', 1200);
   }catch(e){ toast('旋转失败', 'error'); }
@@ -1834,7 +2062,6 @@ function lbNav(d){
   lbUpdate();
 }
 function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
-function showImgSrc(src){ openGallery([src], 0); }
 const draftGallerySrcs = bucket => draft[bucket].flatMap(f => f.type === 'pdf' ? f.pages : [f.dataUrl]);
 function openDraftGallery(bucket, gi){ openGallery(draftGallerySrcs(bucket), gi); }
 function openDetailGallery(bucket, gi){ openGallery(ui.detailGalleries[bucket] || [], gi); }
@@ -1849,7 +2076,7 @@ function filePagesHTML(files, bucketKey){
     const imgs = (f.type === 'pdf' ? f.pages : [f.dataUrl]).map((src, i) => {
       const gi = gal.length; gal.push(src);
       return `${f.type === 'pdf' ? `<div class="pdf-page-label">第 ${i+1} / ${f.pageCount} 页</div>` : ''}
-       <img class="embed-img" src="${src}" onclick="App.openDetailGallery('${bucketKey}',${gi})">`;
+       <img class="embed-img" src="${src}" loading="lazy" onclick="App.openDetailGallery('${bucketKey}',${gi})">`;
     }).join('');
     return head + imgs;
   }).join('') || '<p style="font-size:13px;color:var(--text2);padding:4px 0 10px">暂无附件</p>';
@@ -1877,7 +2104,7 @@ function openDetail(id){
   document.getElementById('detailBody').innerHTML = `
     <h2 style="font-size:20px;font-weight:900;line-height:1.4">${esc(wp.title)}</h2>
     <div class="detail-meta">
-      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
       ${starsHTML(wp.difficulty)}
       <span class="badge" style="background:rgba(79,70,229,.1);color:var(--primary)">掌握度 ${m}%</span>
       ${s.ivl >= MATURE_IVL ? '<span class="badge" style="background:rgba(16,185,129,.12);color:#10b981">🏆 熟练卡</span>' : ''}
@@ -1894,7 +2121,7 @@ function openDetail(id){
       <button class="btn btn-ghost" onclick="App.resetSchedule('${wp.id}')">🔁 重新学习</button>
       <button class="btn btn-ghost" onclick="App.openEditModal('${wp.id}')">✏️ 编辑</button>
       <button class="btn btn-ghost" onclick="App.printSingle('${wp.id}')">🖨️ 打印此项</button>
-      <button class="btn btn-danger" onclick="App.deleteWP('${wp.id}');App.closeDetail()">🗑️ 删除</button>
+      <button class="btn btn-danger" onclick="App.deleteFromDetail('${wp.id}')">🗑️ 删除</button>
     </div>
     ${wp.description ? `<div class="form-label">📋 薄弱描述 / 易错分析</div><div class="detail-desc">${esc(wp.description)}</div>` : ''}
     <div class="form-label">📝 试题（${pageCount(wp.questions)} 页）</div>
@@ -2006,7 +2233,17 @@ function openPrintModal(){
   refreshPrintUI(true);
   document.getElementById('printModal').classList.add('open');
 }
-function closePrintModal(){ document.getElementById('printModal').classList.remove('open'); }
+function closePrintModal(){
+  document.getElementById('printModal').classList.remove('open');
+  restoreSelection();
+}
+function restoreSelection(){
+  if (ui.selBackup){
+    ui.selected = ui.selBackup;
+    ui.selBackup = null;
+    updateSelBar();
+  }
+}
 
 const getPrintItems = () => ui.selected.map(id => DB.weakPoints.find(w => w.id === id)).filter(Boolean);
 
@@ -2029,13 +2266,13 @@ function pqListHTML(){
     const c = catOf(wp.category);
     return `<div class="pq-item">
       <span class="pq-num">${i + 1}</span>
-      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${wp.category}</span>
+      <span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>
       <span class="pq-t" title="${esc(wp.title)}">${esc(wp.title)}</span>
       <span class="pq-c">📝${pageCount(wp.questions)} ✅${pageCount(wp.answers)}</span>
       <span class="pq-ops">
-        <button class="mini-btn" ${i === 0 ? 'disabled' : ''} title="上移" onclick="App.moveSel(${i},-1)">↑</button>
-        <button class="mini-btn" ${i === items.length - 1 ? 'disabled' : ''} title="下移" onclick="App.moveSel(${i},1)">↓</button>
-        <button class="mini-btn del" title="移出队列" onclick="App.unselect('${wp.id}')">✕</button>
+        <button class="mini-btn" ${i === 0 ? 'disabled' : ''} title="上移" aria-label="上移" onclick="App.moveSel(${i},-1)">↑</button>
+        <button class="mini-btn" ${i === items.length - 1 ? 'disabled' : ''} title="下移" aria-label="下移" onclick="App.moveSel(${i},1)">↓</button>
+        <button class="mini-btn del" title="移出队列" aria-label="移出队列" onclick="App.unselect('${wp.id}')">✕</button>
       </span></div>`;
   }).join('');
 }
@@ -2101,7 +2338,7 @@ function richHeadHTML(s){
   const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
   return `<div class="pp-head">
     <div class="pp-row1">
-      <span class="pp-cat" style="color:${c.color}">【${wp.category}】</span>
+      <span class="pp-cat" style="color:${c.color}">【${esc(wp.category)}】</span>
       <span class="pp-title">${esc(wp.title)}</span>
       <span class="pp-tag">${s.label} · 第 ${s.idx} / ${s.total} 页</span>
     </div>
@@ -2120,7 +2357,7 @@ function coverHTML(items, num, N){
     const c = catOf(wp.category);
     return `<div class="cov-item">
       <span class="cov-num">${String(i+1).padStart(2,'0')}</span>
-      <span class="cov-cat" style="color:${c.color}">${wp.category}</span>
+      <span class="cov-cat" style="color:${c.color}">${esc(wp.category)}</span>
       <span class="cov-t">${esc(wp.title)}</span>
       <span class="cov-m">${'★'.repeat(wp.difficulty)} · ${masteryOf(wp)}% · ${wp.sm2.ivl ? fmtIvl(wp.sm2.ivl) : '新卡'}</span>
     </div>`;
@@ -2162,7 +2399,7 @@ function buildPageHTML(page, num, N, extra = ''){
       ${page.slots.map(s => {
         const c = catOf(s.wp.category);
         return `<div class="pp-slot">
-          <div class="pp-cap"><span style="color:${c.color}">【${s.wp.category}】</span>${esc(s.wp.title)} · ${s.label} ${s.idx}/${s.total}</div>
+          <div class="pp-cap"><span style="color:${c.color}">【${esc(s.wp.category)}】</span>${esc(s.wp.title)} · ${s.label} ${s.idx}/${s.total}</div>
           <div class="pp-imgw"><img src="${s.src}"></div>
         </div>`;
       }).join('')}
@@ -2213,23 +2450,58 @@ function executePrint(){
   const imgs = [...pa.querySelectorAll('img')];
   Promise.all(imgs.map(im => im.complete ? 1 : new Promise(r => { im.onload = r; im.onerror = r; })))
     .then(() => setTimeout(() => window.print(), 150));
+  window.onafterprint = () => { pa.innerHTML = ''; window.onafterprint = null; };
   toast(`🖨️ 已生成 ${plan.total} 页打印内容`, 'success');
 }
 function printSingle(id){
+  ui.selBackup = [...ui.selected];
   ui.selected = [id];
   openPrintModal();
 }
 
 /* ============================================================
-   确认框 / 输入框 / Toast
+   确认框 / 输入框 / Toast  / 通用关闭
 ============================================================ */
+function getLayerZ(el){
+  if (el.classList.contains('modal-mask')) return parseInt(el.style.zIndex, 10) || 200;
+  return 400;
+}
+function topmostOpen(){
+  const layers = [];
+  document.querySelectorAll('.modal-mask.open').forEach(m => layers.push(m));
+  const lb = document.getElementById('lightbox');
+  if (lb.classList.contains('open')) layers.push(lb);
+  if (!layers.length) return null;
+  return layers.sort((a, b) => getLayerZ(b) - getLayerZ(a))[0];
+}
+function genericClose(mask){
+  const fn = {
+    editModal: closeEditModal,
+    pdfModal: closePdfModal,
+    detailModal: closeDetail,
+    gradeModal: closeGradeModal,
+    printModal: closePrintModal,
+    inputModal: () => closeInputModal(false)
+  }[mask.id];
+  if (fn){ fn(); return; }
+  if (mask.id === 'confirmModal'){
+    const c = document.getElementById('confirmCancel');
+    if (c && c.onclick) c.onclick(); else mask.classList.remove('open');
+    return;
+  }
+  mask.classList.remove('open');
+}
+
+let confirmActive = false;
 function confirmDialog(msg){
   return new Promise(res => {
+    if (confirmActive){ res(false); return; }
+    confirmActive = true;
     const m = document.getElementById('confirmModal');
     document.getElementById('confirmMsg').textContent = msg;
     m.classList.add('open');
-    document.getElementById('confirmOk').onclick = () => { m.classList.remove('open'); res(true); };
-    document.getElementById('confirmCancel').onclick = () => { m.classList.remove('open'); res(false); };
+    document.getElementById('confirmOk').onclick = () => { confirmActive = false; m.classList.remove('open'); res(true); };
+    document.getElementById('confirmCancel').onclick = () => { confirmActive = false; m.classList.remove('open'); res(false); };
   });
 }
 let inputResolver = null;
@@ -2274,9 +2546,11 @@ function toggleTheme(){
 function exportData(){
   const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
+  a.href = url;
   a.download = `物理竞赛备份_${dateKey()}.json`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
   toast('📤 备份文件已导出', 'success');
 }
 function importData(input){
@@ -2289,13 +2563,16 @@ function importData(input){
       const data = JSON.parse(e.target.result);
       if (!Array.isArray(data.weakPoints)) throw 0;
       if (!await confirmDialog(`备份包含 ${data.weakPoints.length} 个薄弱点，导入将覆盖当前全部数据，确定继续？`)) return;
-      DB = data;
-      DB.weakPoints = DB.weakPoints.map(migrateWP);
-      DB.activity = DB.activity || {};
+      DB = {
+        weakPoints: (data.weakPoints || []).map(migrateWP).map(sanitizeWP),
+        activity: data.activity || {},
+        settings: data.settings && typeof data.settings === 'object' ? data.settings : { theme: 'light' }
+      };
       backfillActivity();
-      DB.settings = DB.settings || { theme: 'light' };
       ui.upload = Object.assign({maxRes:1800, quality:.85, pdfScale:2}, DB.settings.upload);
       printCfg = normalizePrintCfg(DB.settings.print);
+      knownFileIds = allFileIds(DB);
+      pendingBlobIds = new Set(allFileIds(DB));
       saveDB(); applyTheme(); renderAll();
       toast('📥 数据导入成功', 'success');
     }catch(_){ toast('导入失败：文件格式不正确', 'error'); }
@@ -2308,15 +2585,21 @@ function importData(input){
 ============================================================ */
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape')
-    document.querySelectorAll('.modal-mask.open,#lightbox.open').forEach(m => m.classList.remove('open'));
+  if (e.key === 'Escape'){
+    const top = topmostOpen();
+    if (top){
+      if (top.id === 'lightbox') closeLightbox();
+      else genericClose(top);
+      return;
+    }
+  }
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
     if (document.getElementById('lightbox').classList.contains('open'))
       lbNav(e.key === 'ArrowRight' ? 1 : -1);
   }
 });
 document.querySelectorAll('.modal-mask').forEach(m =>
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+  m.addEventListener('click', e => { if (e.target === m) genericClose(m); }));
 ['dropQ', 'dropA'].forEach((id, i) => {
   const dz = document.getElementById(id), bucket = i ? 'answers' : 'questions';
   ['dragover', 'dragenter'].forEach(ev => dz.addEventListener(ev, e => {
@@ -2327,6 +2610,7 @@ document.querySelectorAll('.modal-mask').forEach(m =>
     e.preventDefault(); dz.classList.remove('drag');
   }));
   dz.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
     if (dragThumb || !e.dataTransfer.files.length) return;
     setPasteBucket(bucket);
     App.handleDrop(e.dataTransfer.files, bucket);
@@ -2335,23 +2619,25 @@ document.querySelectorAll('.modal-mask').forEach(m =>
 
 window.App = {
   switchView, toggleTheme, exportData, importData, requestPersist,
-  openEditModal, closeEditModal, saveWeakPoint, deleteWP,
+  openEditModal, closeEditModal, saveWeakPoint, deleteWP, deleteFromDetail,
   setDifficulty: n => { ui.difficulty = n; buildStarInput(); },
   setUpload, setPasteBucket,
   handleFiles: (input, b) => handleFiles(input, b),
   handleDrop: (files, b) => handleFiles({ files, value: '' }, b),
   removeDraft, rotateDraft, renameDraft, clearDraft,
-  openDraftGallery, openDetailGallery, showImgSrc, lbNav, closeLightbox,
-  pdfEstUpdate, confirmPdfImport, closePdfModal,
+  openDraftGallery, openDetailGallery, lbNav, closeLightbox,
+  pdfEstUpdate, confirmPdfImport, closePdfModal, closePdfModalCancelAll,
   openDetail, closeDetail, toggleAnswerBlur, resetSchedule,
   openGradeModal, closeGradeModal, applyGrade,
   setHeatRange: w => { ui.heatWeeks = w; renderHeatmap(); },
   setCat: c => { ui.filterCat = c; renderLibrary(); },
-  onSearch: () => renderLibrary(), onFilter: () => renderLibrary(),
+  onSearch: () => { clearTimeout(_searchTimer); _searchTimer = setTimeout(renderLibrary, 200); },
+  onFilter: () => renderLibrary(),
   toggleSelectMode, cardClick, selectAll, clearSelection,
   openPrintModal, closePrintModal, onPrintInput, moveSel, unselect, executePrint, printSingle,
   closeInputModal
 };
+let _searchTimer = null;
 
 if (typeof pdfjsLib !== 'undefined')
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2360,7 +2646,7 @@ if (typeof pdfjsLib !== 'undefined')
    启动
 ============================================================ */
 (async function boot(){
-  const { data, legacy } = await loadData();
+  const { data, legacy, idbMode } = await loadData();
   let db = data;
   if (!db || !Array.isArray(db.weakPoints)) db = { weakPoints:[], activity:{}, settings:{theme:'light'} };
   db.activity = db.activity || {};
@@ -2371,6 +2657,14 @@ if (typeof pdfjsLib !== 'undefined')
   backfillActivity();
   ui.upload = Object.assign({maxRes:1800, quality:.85, pdfScale:2}, DB.settings.upload);
   printCfg = normalizePrintCfg(DB.settings.print);
+
+  if (legacy && idbAvailable){
+    pendingBlobIds = new Set(allFileIds(DB));
+    knownFileIds = new Set(allFileIds(DB));
+  } else if (idbMode){
+    knownFileIds = new Set(allFileIds(DB));
+  }
+
   applyTheme();
   renderAll();
   const mode = await saveDB();
