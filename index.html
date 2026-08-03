@@ -337,25 +337,26 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 .print-page{position:relative;page-break-after:always;display:flex;flex-direction:column;overflow:hidden;background:#fff;color:#0f172a;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .print-page:last-child{page-break-after:auto}
 .print-page.page-auto{display:block;overflow:visible;height:auto}
-.pp-head{border-bottom:2.5px solid #4f46e5;padding-bottom:7px;margin-bottom:9px}
+.pp-head{border-bottom:2.5px solid #4f46e5;padding-bottom:6px;margin-bottom:8px}
 .pp-row1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
-.pp-cat{font-weight:900;font-size:12.5pt}
-.pp-title{font-size:15.5pt;font-weight:900}
-.pp-tag{margin-left:auto;font-size:9pt;font-weight:800;background:#eef2ff;color:#4f46e5;padding:3px 11px;border-radius:14px;border:1px solid #c7d2fe}
-.pp-meta{font-size:8.5pt;color:#475569;margin-top:5px}
-.pp-desc{font-size:8.5pt;color:#334155;margin-top:5px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:5px 9px;line-height:1.55}
-.pp-date{font-size:8.5pt;color:#64748b;margin-top:5px;font-weight:700}
-.pp-body{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
-.pp-body img{max-width:100%;max-height:100%;object-fit:contain;border:1px solid #e2e8f0;border-radius:4px}
-.pp-body .pp-text{width:100%;padding:8mm 10mm;font-size:11pt;line-height:1.8;white-space:pre-wrap;text-align:left}
-.pp-textpage-body{padding:4mm 2mm 8mm;font-size:11pt;line-height:1.9;white-space:pre-wrap;text-align:left;break-inside:auto}
-.pp-foot{text-align:center;font-size:8pt;color:#94a3b8;padding-top:6px;border-top:1px solid #e2e8f0;margin-top:8px}
-.pp-grid{flex:1;display:grid;gap:7mm;min-height:0}
+.pp-cat{font-weight:900;font-size:10.5pt}
+.pp-title{font-size:13pt;font-weight:900}
+.pp-tag{margin-left:auto;font-size:7.5pt;font-weight:800;background:#eef2ff;color:#4f46e5;padding:3px 11px;border-radius:14px;border:1px solid #c7d2fe}
+.pp-meta{font-size:7.5pt;color:#475569;margin-top:4px}
+.pp-desc{font-size:7.5pt;color:#334155;margin-top:4px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px;line-height:1.5}
+.pp-date{font-size:7.5pt;color:#64748b;margin-top:4px;font-weight:700}
+/* 单图页：图片靠顶部水平居中 */
+.pp-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:0}
+.pp-body img{max-width:100%;max-height:100%;object-fit:contain;border:1px solid #e2e8f0;border-radius:4px;margin-top:2mm}
+/* 长文分页：可跨页，不会裁切 */
+.pp-textpage-body{padding:2.5mm 2mm 5mm;font-size:8.5pt;line-height:1.65;white-space:pre-wrap;text-align:left;break-inside:auto}
+.pp-foot{text-align:center;font-size:7pt;color:#94a3b8;padding-top:5px;border-top:1px solid #e2e8f0;margin-top:7px}
+.pp-grid{flex:1;display:grid;gap:5mm;min-height:0}
 .pp-slot{display:flex;flex-direction:column;min-height:0;min-width:0}
-.pp-cap{font-size:8.5pt;font-weight:800;color:#334155;margin-bottom:2mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-cap{font-size:7.5pt;font-weight:800;color:#334155;margin-bottom:1.5mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pp-imgw{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;border:1px solid #e2e8f0;border-radius:4px;overflow:hidden}
 .pp-imgw img{max-width:100%;max-height:100%;object-fit:contain}
-.pp-imgw .pptext{width:100%;height:100%;padding:3mm 4mm;font-size:8.5pt;line-height:1.6;white-space:pre-wrap;text-align:left;overflow:hidden}
+.pp-imgw .pptext{width:100%;height:100%;padding:2.5mm 3mm;font-size:7.5pt;line-height:1.5;white-space:pre-wrap;text-align:left;overflow:hidden}
 .div-page{align-items:center;justify-content:center;text-align:center}
 .div-ico{font-size:50pt}
 .div-t{font-size:23pt;font-weight:900;margin:5mm 0 2mm}
@@ -367,12 +368,12 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 .cov-title{font-size:21pt;font-weight:900;letter-spacing:1px;line-height:1.3}
 .cov-sub{font-size:9pt;opacity:.88;margin-top:2mm}
 .cov-stats{display:flex;gap:4mm;font-size:8.5pt;margin-top:4mm;flex-wrap:wrap;font-weight:700}
-.cov-list{flex:1;column-gap:8mm;font-size:9pt;min-height:0;overflow:hidden}
-.cov-item{break-inside:avoid;display:flex;gap:2.5mm;align-items:baseline;padding:2.1mm 0;border-bottom:1px dashed #e2e8f0}
-.cov-num{color:#94a3b8;font-weight:800;font-size:8pt}
+.cov-list{flex:1;column-gap:8mm;font-size:8.5pt;min-height:0;overflow:hidden}
+.cov-item{break-inside:avoid;display:flex;gap:2.5mm;align-items:baseline;padding:2mm 0;border-bottom:1px dashed #e2e8f0}
+.cov-num{color:#94a3b8;font-weight:800;font-size:7.5pt}
 .cov-cat{font-weight:900;white-space:nowrap}
 .cov-t{flex:1;font-weight:700;min-width:0}
-.cov-m{color:#64748b;white-space:nowrap;font-size:7.5pt}
+.cov-m{color:#64748b;white-space:nowrap;font-size:7pt}
 @media(max-width:920px){
   #app{grid-template-columns:1fr}
   #sidebar{position:static;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:12px 14px;gap:6px}
@@ -416,7 +417,6 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
     <div id="topbar">
       <div><h1 id="viewTitle">仪表盘</h1><p id="viewSubtitle"></p></div>
       <div style="display:flex;gap:9px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" id="selModeEnter" style="display:none" onclick="App.switchView('library');App.toggleSelectMode()">☑ 多选管理</button>
         <button class="btn btn-primary" onclick="App.openEditModal()">＋ 录入薄弱点</button>
       </div>
     </div>
@@ -840,6 +840,8 @@ const MASTERY_BASE = 61;
 const HEAT_LEVELS = [2,4,6];
 const PDF_EST_BYTES_PER_PX = 95;
 const MAX_CANVAS_PIXELS = 16.8e6;
+/* 修复：文本字段上限提升，避免导入/导出往返时静默截断数据 */
+const MAX_TEXT = 100000;
 
 const uid = () => { if (window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g,''); return Date.now().toString(36) + Math.random().toString(36).slice(2,8); };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1015,7 +1017,8 @@ function backfillActivity(){
 }
 let DB = null;
 const OK_DATAURL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
-const OK_STR = v => typeof v === 'string' ? v.slice(0, 5000) : '';
+/* 修复：上限由 5000 提升至 MAX_TEXT(100000)，防止导入往返静默丢失长文本 */
+const OK_STR = v => typeof v === 'string' ? v.slice(0, MAX_TEXT) : '';
 const OK_ID = v => /^[a-z0-9]+$/i.test(v) ? v : uid();
 function sanitizeFile(f){
   if (!f || typeof f !== 'object') return null;
@@ -1053,6 +1056,9 @@ async function loadData(){
   if (!data || !Array.isArray(data.weakPoints)){ try{ const raw = localStorage.getItem(STORE_KEY); if (raw){ data = JSON.parse(raw); legacy = true; } }catch(e){} }
   return { data, legacy, idbMode };
 }
+/* 修复：提供防抖保存队列，供频繁设置（主题/模式/上传）复用 */
+let _saveTimer = null;
+function queueSave(delay = 500){ clearTimeout(_saveTimer); _saveTimer = setTimeout(() => { saveDB(); }, delay); }
 async function saveDB(){
   try{ localStorage.setItem(THEME_KEY, DB.settings.theme); }catch(e){}
   let mode = 'ls';
@@ -1182,7 +1188,7 @@ function applyMode(){
 function toggleMode(){
   ui.mode = ui.mode === 'study' ? 'browse' : 'study';
   DB.settings.browseMode = ui.mode === 'browse';
-  saveDB(); applyMode();
+  queueSave(); applyMode();
   toast(isBrowse() ? '📖 已切换到浏览模式：复习记忆功能关闭，题库管理与打印保留' : '📚 已切换到学习模式：恢复正常复习记忆功能', isBrowse() ? 'warn' : 'success');
 }
 
@@ -1521,7 +1527,7 @@ async function deleteSelected(){
 /* ================= 附件系统 ================= */
 function syncUploadDOM(){ document.getElementById('up-maxRes').value = ui.upload.maxRes; document.getElementById('up-quality').value = Math.round(ui.upload.quality*100); document.getElementById('up-pdfScale').value = ui.upload.pdfScale; updateUploadLabels(); }
 function updateUploadLabels(){ document.getElementById('upQVal').textContent = Math.round(ui.upload.quality*100)+'%'; document.getElementById('upSetSum').textContent = `（${ui.upload.maxRes>=3200?'原图':ui.upload.maxRes+'px'} · ${Math.round(ui.upload.quality*100)}% · PDF ${ui.upload.pdfScale}x）`; }
-function setUpload(){ ui.upload = { maxRes: +document.getElementById('up-maxRes').value, quality: +document.getElementById('up-quality').value/100, pdfScale: +document.getElementById('up-pdfScale').value }; DB.settings.upload = ui.upload; saveDB(); updateUploadLabels(); }
+function setUpload(){ ui.upload = { maxRes: +document.getElementById('up-maxRes').value, quality: +document.getElementById('up-quality').value/100, pdfScale: +document.getElementById('up-pdfScale').value }; DB.settings.upload = ui.upload; queueSave(); updateUploadLabels(); }
 function setPasteBucket(b){ ui.pasteBucket = b; document.getElementById('ptagQ').classList.toggle('on', b === 'questions'); document.getElementById('ptagA').classList.toggle('on', b === 'answers'); }
 function renderDraftThumbs(){
   const render = (bucket, elId, cntId) => {
@@ -1791,7 +1797,7 @@ function slotsOf(wp, label){
 }
 function textTooLongForGrid(slot, perPage){
   if (slot.type !== 'text') return false;
-  const capacity = perPage === 1 ? 550 : perPage === 2 ? 400 : 180;
+  const capacity = perPage === 1 ? 2800 : perPage === 2 ? 400 : 180;
   return slot.text.length > capacity;
 }
 function assemblePrint(){
@@ -1863,8 +1869,12 @@ function buildPageHTML(page, num, N, extra = ''){
   }
   if (printCfg.perPage === 1){
     const s = page.slots[0];
-    const body = s.type === 'text' ? `<div class="pp-body"><div class="pp-text">${esc(s.text).replace(/\n/g,'<br>')}</div></div>` : `<div class="pp-body"><img src="${s.src}"></div>`;
-    return `<div class="print-page" style="${base}">${richHeadHTML(s)}${body}${footHTML(num,N)}</div>`;
+    /* 修复：单页文字也走自动分页，超长自动跨页，避免被 overflow:hidden 裁切 */
+    if (s.type === 'text'){
+      const autoBase = `width:${w}mm;min-height:${h}mm;padding:${m}mm;${extra}`;
+      return `<div class="print-page page-auto" style="${autoBase}">${richHeadHTML(s)}<div class="pp-textpage-body">${esc(s.text).replace(/\n/g,'<br>')}</div>${footHTML(num,N)}</div>`;
+    }
+    return `<div class="print-page" style="${base}">${richHeadHTML(s)}<div class="pp-body"><img src="${s.src}"></div>${footHTML(num,N)}</div>`;
   }
   const gridStyle = printCfg.perPage === 2 ? (printCfg.orient === 'portrait' ? 'grid-template-rows:repeat(2,1fr)' : 'grid-template-columns:repeat(2,1fr)') : 'grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)';
   return `<div class="print-page" style="${base}"><div class="pp-grid" style="${gridStyle}">${page.slots.map(s => { const c = catOf(s.wp.category); return `<div class="pp-slot"><div class="pp-cap"><span style="color:${c.color}">【${esc(s.wp.category)}】</span>${esc(s.wp.title)} · ${s.label} ${s.idx}/${s.total}</div><div class="pp-imgw">${s.type==='text'?`<div class="pptext">${esc(s.text).replace(/\n/g,'<br>')}</div>`:`<img src="${s.src}">`}</div></div>`; }).join('')}</div>${footHTML(num,N)}</div>`;
@@ -1982,7 +1992,13 @@ function refreshDataModal(){
 }
 function buildExportPayload(wps, light){ return { meta: { app:'physics-trainer', format:3, light: !!light, exportedAt: Date.now(), count: wps.length }, weakPoints: light ? wps.map(wp => ({...wp, questions:(wp.questions||[]).map(fileRef).filter(Boolean), answers:(wp.answers||[]).map(fileRef).filter(Boolean)})) : wps, activity: DB.activity, settings: DB.settings }; }
 function downloadJSON(obj,name){ const blob = new Blob([JSON.stringify(obj)], { type:'application/json' }); const a = document.createElement('a'); const url = URL.createObjectURL(blob); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 4000); }
-function exportData(mode){ const light = mode === 'light'; downloadJSON(buildExportPayload(DB.weakPoints, light), `物理竞赛备份_${light?'精简_':''}${dateKey()}.json`); toast(light ? '📄 精简备份已导出（不含附件，仅保留文字与进度）' : '📦 完整备份已导出', 'success', 3000); }
+function exportData(mode){ 
+  const light = mode === 'light';
+  const hasHeavy = !light && (() => { let bytes = 0; DB.weakPoints.forEach(w => [...(w.questions||[]), ...(w.answers||[])].forEach(f => bytes += fileSize(f))); return bytes; })();
+  if (hasHeavy > 25*1048576){ toast(`⚠️ 备份体积较大（约 ${fmtBytes(hasHeavy)}），可能耗时较长或导致卡顿。建议改用「精简备份」或分批导出。`, 'warn', 5000); }
+  downloadJSON(buildExportPayload(DB.weakPoints, light), `物理竞赛备份_${light?'精简_':''}${dateKey()}.json`);
+  toast(light ? '📄 精简备份已导出（不含附件，仅保留文字与进度）' : '📦 完整备份已导出', 'success', 3000);
+}
 function exportSelected(){ const wps = getPrintItems(); if (!wps.length){ toast('请先勾选条目', 'warn'); return; } downloadJSON(buildExportPayload(wps,false), `物理竞赛备份_精选${wps.length}项_${dateKey()}.json`); toast(`📤 已导出所选 ${wps.length} 项（含附件）`, 'success'); }
 async function handleImportFile(files){
   const file = files && files[0];
@@ -1993,7 +2009,10 @@ async function handleImportFile(files){
   try{ data = JSON.parse(await file.text()); }catch(e){ toast('导入失败：不是有效的 JSON 文件', 'error'); return; }
   const rawWps = Array.isArray(data) ? data : data.weakPoints;
   if (!Array.isArray(rawWps)){ toast('导入失败：文件中找不到薄弱点数据', 'error'); return; }
-  const wps = rawWps.map(migrateWP).map(sanitizeWP);
+  /* 修复：检测超长字段截断并提示 */
+  let truncated = 0;
+  const wps = rawWps.map(migrateWP).map(wp => { const s = sanitizeWP(wp); ['title','description','questionText','answerText'].forEach(k => { if (s[k] && String(wp[k]).length > s[k].length) truncated++; }); return s; });
+  if (truncated) toast(`⚠️ 检测到 ${truncated} 处超长文本（超过 ${MAX_TEXT} 字符）将在导入时截断，请检查源文件`, 'warn', 4500);
   const attCount = wps.reduce((n,w) => n + w.questions.length + w.answers.length, 0);
   const bytes = wps.reduce((s,w) => s + [...w.questions, ...w.answers].reduce((a,f) => a + fileSize(f), 0), 0);
   const when = (data && data.meta && data.meta.exportedAt) ? fmtFull(data.meta.exportedAt) : '未知时间（旧版备份）';
@@ -2050,7 +2069,7 @@ function toast(msg, type = 'info', dur = 2600){
 
 /* ================= 主题 / 模式 ================= */
 function applyTheme(){ document.documentElement.dataset.theme = DB.settings.theme; document.getElementById('themeBtn').textContent = DB.settings.theme === 'dark' ? '☀️ 浅色' : '🌙 深色'; }
-function toggleTheme(){ DB.settings.theme = DB.settings.theme === 'dark' ? 'light' : 'dark'; saveDB(); applyTheme(); }
+function toggleTheme(){ DB.settings.theme = DB.settings.theme === 'dark' ? 'light' : 'dark'; queueSave(); applyTheme(); }
 
 /* ================= 清空全部数据 ================= */
 async function clearAllData(){
@@ -2075,9 +2094,43 @@ async function clearAllData(){
 
 /* ================= 事件绑定 ================= */
 document.querySelectorAll('.nav-btn').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
+/* 修复：模态框焦点管理 —— 打开时捕获、关闭时还原，并提供 Tab 焦点陷阱 */
+let _prevFocusEl = null;
+const _modalObserver = new MutationObserver(muts => {
+  muts.forEach(m => {
+    const el = m.target;
+    if (!el.classList || !el.classList.contains('modal-mask') || m.attributeName !== 'class') return;
+    const opened = el.classList.contains('open');
+    const wasOpen = _modalObserver._state && _modalObserver._state.has(el);
+    if (opened && !wasOpen){
+      _modalObserver._state = _modalObserver._state || new Set();
+      _modalObserver._state.add(el);
+      if (!_prevFocusEl) _prevFocusEl = document.activeElement;
+      const f = [...el.querySelectorAll('button:not(:disabled),input,select,textarea')].find(x => x.offsetParent !== null);
+      if (f) setTimeout(() => f.focus(), 10);
+    } else if (!opened && wasOpen){
+      _modalObserver._state.delete(el);
+      if (_prevFocusEl && _prevFocusEl.isConnected) _prevFocusEl.focus();
+      _prevFocusEl = null;
+    }
+  });
+});
+_modalObserver.observe(document.body, { attributes:true, subtree:true, attributeFilter:['class'] });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape'){ const top = topmostOpen(); if (top){ if (top.id === 'lightbox') closeLightbox(); else genericClose(top); return; } }
   if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ if (document.getElementById('lightbox').classList.contains('open')) lbNav(e.key === 'ArrowRight' ? 1 : -1); }
+  /* Tab 焦点陷阱：限制在模态框内循环 */
+  if (e.key === 'Tab'){
+    const top = topmostOpen();
+    if (top && top.classList && top.classList.contains('modal-mask') && top.classList.contains('open')){
+      const focusable = [...top.querySelectorAll('button:not(:disabled),input,select,textarea')].filter(el => el.offsetParent !== null);
+      if (focusable.length){
+        const first = focusable[0], last = focusable[focusable.length-1];
+        if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      }
+    }
+  }
 });
 document.querySelectorAll('.modal-mask').forEach(m => m.addEventListener('click', e => { if (e.target === m) genericClose(m); }));
 ['dropQ','dropA'].forEach((id,i) => {
