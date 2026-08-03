@@ -8,6 +8,28 @@
 try{var t=localStorage.getItem('physics_wp_theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<script>
+/* MathJax 3 配置：手动排版（startup.typeset=false），加载完成后通过 window.__mjFlush 冲刷待渲染队列 */
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  chtml: { scale: 0.96, matchFontHeight: true },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code','input','select','option'] },
+  startup: {
+    typeset: false,
+    ready: () => {
+      MathJax.startup.defaultReady();
+      window.__mjReady = true;
+      if (window.__mjFlush) window.__mjFlush();
+    }
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
 <style>
 /* ================= 主题变量 ================= */
 :root{
@@ -42,6 +64,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 input,select,textarea{font-family:inherit;font-size:14px;color:var(--text)}
 img{user-select:none}
 #app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:2px 0}
 
 /* ================= 侧边栏 ================= */
 #sidebar{background:var(--sidebar-bg);color:#e5e7fb;display:flex;flex-direction:column;
@@ -255,6 +278,15 @@ img{user-select:none}
 .star-input button.on{color:#f59e0b;text-shadow:0 2px 8px rgba(245,158,11,.4)}
 .star-input button:hover{transform:scale(1.25)}
 
+/* ================= LaTeX 输入预览 ================= */
+.latex-tip{font-size:10px;font-weight:700;color:var(--primary);background:rgba(79,70,229,.08);
+  border:1px solid rgba(79,70,229,.22);padding:2.5px 9px;border-radius:11px;margin-left:auto;white-space:nowrap}
+.latex-preview{margin-top:8px;padding:9px 13px 10px;border:1.5px dashed rgba(79,70,229,.45);border-radius:10px;
+  background:var(--surface);font-size:13.5px;line-height:1.75;display:none;word-break:break-word;overflow-x:auto}
+.latex-preview.show{display:block;animation:fadeIn .2s}
+.latex-preview::before{content:"∑ LaTeX 预览";display:block;font-size:9.5px;font-weight:800;
+  color:var(--primary);letter-spacing:1px;margin-bottom:3px;opacity:.7}
+
 /* ================= 附件系统 v2 ================= */
 .attach-section{border:1.5px solid var(--border);border-radius:13px;padding:15px;margin-bottom:15px;background:var(--surface2)}
 .attach-head{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:800;margin-bottom:11px}
@@ -305,6 +337,19 @@ img{user-select:none}
 .pdf-est{background:rgba(79,70,229,.06);border:1px solid rgba(79,70,229,.2);border-radius:11px;
   padding:11px 15px;font-size:12.5px;color:var(--text2)}
 .pdf-est b{color:var(--primary)}
+
+/* ================= 数据管理 ================= */
+.dm-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.dm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dm-grid .btn{flex-direction:column;gap:2px;padding:13px 8px}
+.dm-grid .btn small{font-size:10.5px;opacity:.78;font-weight:500}
+.import-panel{border:1.5px solid var(--primary);border-radius:12px;padding:14px;margin-top:12px;
+  background:rgba(79,70,229,.04);animation:fadeIn .25s}
+.import-panel .pdf-info{margin-bottom:12px}
+.danger-zone{border:1.5px dashed rgba(239,68,68,.45);border-radius:12px;padding:15px;margin-top:22px;
+  background:rgba(239,68,68,.04)}
+.danger-zone .dz-title{font-size:13px;font-weight:900;color:var(--danger);margin-bottom:6px}
+.danger-zone p{font-size:11.5px;color:var(--text2);margin-bottom:10px;line-height:1.6}
 
 /* ================= 详情 ================= */
 .detail-meta{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
@@ -480,10 +525,8 @@ img{user-select:none}
       </div>
       <div class="sf-btns">
         <button class="sf-btn" onclick="App.toggleTheme()" id="themeBtn">🌙 深色</button>
-        <button class="sf-btn" onclick="App.exportData()">📤 导出</button>
-        <button class="sf-btn" onclick="document.getElementById('importFile').click()">📥 导入</button>
+        <button class="sf-btn" onclick="App.openDataModal()">💾 数据管理</button>
       </div>
-      <input type="file" id="importFile" accept=".json" hidden onchange="App.importData(this)">
     </div>
   </aside>
 
@@ -595,6 +638,7 @@ img{user-select:none}
   <div class="sep"></div>
   <button class="btn btn-ghost btn-sm" onclick="App.selectAll()">全选</button>
   <button class="btn btn-ghost btn-sm" onclick="App.clearSelection()">清空</button>
+  <button class="btn btn-ghost btn-sm" id="selExport" onclick="App.exportSelected()">📤 导出所选</button>
   <button class="btn btn-primary btn-sm" id="selPrint" onclick="App.openPrintModal()">🖨️ 组合打印</button>
   <button class="btn btn-ghost btn-sm" onclick="App.toggleSelectMode()">退出</button>
 </div>
@@ -608,8 +652,10 @@ img{user-select:none}
     </div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-label">薄弱点标题 <span class="req">*</span></div>
-        <input class="form-input" id="f-title" placeholder="例：斜面模型中摩擦力方向判断">
+        <div class="form-label">薄弱点标题 <span class="req">*</span>
+          <span class="latex-tip">∑ 支持 LaTeX：$…$ / $$…$$</span></div>
+        <input class="form-input" id="f-title" placeholder="例：斜面模型摩擦力方向判断 $f=\mu mg\cos\theta$" oninput="App.previewLatex()">
+        <div class="latex-preview" id="f-title-preview"></div>
       </div>
       <div class="form-2col">
         <div class="form-row">
@@ -622,8 +668,10 @@ img{user-select:none}
         </div>
       </div>
       <div class="form-row">
-        <div class="form-label">薄弱描述 / 易错分析</div>
-        <textarea class="form-textarea" id="f-desc" placeholder="记录错误原因、关键陷阱、正确思路要点…"></textarea>
+        <div class="form-label">薄弱描述 / 易错分析
+          <span class="latex-tip">∑ 支持 LaTeX 公式</span></div>
+        <textarea class="form-textarea" id="f-desc" placeholder="记录错误原因、关键陷阱、正确思路要点… 可插入公式，如 $\Delta v=a\,\Delta t$、$$\oint\vec{E}\cdot d\vec{l}=-\frac{d\Phi_B}{dt}$$" oninput="App.previewLatex()"></textarea>
+        <div class="latex-preview" id="f-desc-preview"></div>
       </div>
 
       <details class="up-set">
@@ -714,6 +762,54 @@ img{user-select:none}
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="App.closePdfModal()">取消</button>
       <button class="btn btn-primary" onclick="App.confirmPdfImport()">📥 开始导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 数据管理模态框 ============ -->
+<div class="modal-mask" id="dataModal" role="dialog" aria-modal="true" aria-label="数据管理">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-head">
+      <div class="modal-title">💾 数据管理</div>
+      <button class="modal-close" onclick="App.closeDataModal()" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="dm-stats" id="dmStats"></div>
+
+      <div class="form-label">📤 导出备份</div>
+      <div class="dm-grid">
+        <button class="btn btn-primary" onclick="App.exportData('full')">📦 完整备份<small>含全部附件 · <span id="dmFullSize"></span></small></button>
+        <button class="btn btn-ghost" onclick="App.exportData('light')">📄 精简备份<small>仅文字与复习进度 · 体积极小</small></button>
+      </div>
+
+      <div class="form-label" style="margin-top:22px">📥 导入备份</div>
+      <div class="dropzone" id="importDrop" onclick="document.getElementById('importFile2').click()">
+        <span class="dz-ico">📂</span>点击选择 / 拖拽备份文件到此
+        <span class="dz-hint">支持完整 / 精简备份（.json）· 导入前可预览并选择合并或覆盖</span>
+      </div>
+      <input type="file" id="importFile2" hidden accept=".json,application/json" onchange="App.handleImportFile(this.files)">
+      <div class="import-panel" id="importPreview" style="display:none">
+        <div class="pdf-info" id="impInfo"></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px" id="impDetail"></div>
+        <div class="chip-grp" style="margin-bottom:10px">
+          <label class="chip"><input type="radio" name="imp-mode" value="merge" checked>🔀 合并导入</label>
+          <label class="chip"><input type="radio" name="imp-mode" value="replace">♻️ 覆盖导入</label>
+        </div>
+        <p style="font-size:11px;color:var(--text2);margin-bottom:13px;line-height:1.65">
+          🔀 <b>合并</b>：保留现有数据，仅新增条目（ID 重复自动跳过），复习热力取较大值；<br>
+          ♻️ <b>覆盖</b>：删除当前全部数据后导入（执行前需二次确认）。
+        </p>
+        <div style="display:flex;gap:9px;justify-content:flex-end">
+          <button class="btn btn-ghost btn-sm" onclick="App.cancelImport()">取消</button>
+          <button class="btn btn-primary btn-sm" onclick="App.confirmImport()">✅ 执行导入</button>
+        </div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="dz-title">⚠️ 危险操作</div>
+        <p>清空全部数据：删除所有薄弱点、附件、复习记录与统计（保留主题设置）。此操作不可恢复，请务必先导出备份。</p>
+        <button class="btn btn-danger btn-sm" onclick="App.clearAllData()">🗑️ 清空全部数据</button>
+      </div>
     </div>
   </div>
 </div>
@@ -921,6 +1017,51 @@ const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.on
 const structClone = v => (window.structuredClone ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
 
 /* ============================================================
+   LaTeX 排版（MathJax 3，手动调度）
+============================================================ */
+function typeset(el){
+  if (!el) return;
+  if (window.__mjReady && window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise([el]).catch(e => console.warn('MathJax:', e));
+  } else {
+    /* MathJax 尚未加载完成：入队，待 __mjFlush 冲刷 */
+    (window.__mjPending = window.__mjPending || new Set()).add(el);
+  }
+}
+async function typesetWait(el){
+  if (el && window.__mjReady && window.MathJax && MathJax.typesetPromise){
+    try{ await MathJax.typesetPromise([el]); }catch(e){ console.warn('MathJax:', e); }
+  }
+}
+window.__mjFlush = function(){
+  const s = window.__mjPending;
+  if (!s) return;
+  s.forEach(el => { if (el.isConnected) typeset(el); });
+  s.clear();
+};
+
+/* 编辑表单 LaTeX 实时预览 */
+let _latexTimer = null;
+function previewLatex(){
+  clearTimeout(_latexTimer);
+  _latexTimer = setTimeout(() => {
+    [['f-title','f-title-preview'], ['f-desc','f-desc-preview']].forEach(([src, pv]) => {
+      const v = document.getElementById(src).value;
+      const box = document.getElementById(pv);
+      const hasMath = /\$[^$]+\$|\\\(|\\\[|\\frac|\\sqrt|\\vec/.test(v);
+      if (hasMath){
+        box.innerHTML = esc(v).replace(/\n/g, '<br>');
+        box.classList.add('show');
+        typeset(box);
+      } else {
+        box.classList.remove('show');
+        box.innerHTML = '';
+      }
+    });
+  }, 220);
+}
+
+/* ============================================================
    存储引擎：IndexedDB（元数据 + 附件 Blob 分离）
 ============================================================ */
 const IDB_NAME = 'physics_trainer_idb';
@@ -1000,6 +1141,16 @@ async function idbGetMany(ids){
     const out = {};
     ids.forEach(k => { const rq = store.get(k); rq.onsuccess = () => { if (rq.result) out[k] = rq.result; }; });
     tx.oncomplete = () => res(out);
+    tx.onerror = () => rej(tx.error);
+  });
+}
+async function idbClearAll(){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction([IDB_STORE, IDB_FILES], 'readwrite');
+    tx.objectStore(IDB_STORE).clear();
+    tx.objectStore(IDB_FILES).clear();
+    tx.oncomplete = () => res();
     tx.onerror = () => rej(tx.error);
   });
 }
@@ -1410,6 +1561,9 @@ function renderDashboard(){
         <div class="rv-sub">录入于 ${fmtFull(wp.createdAt)} · 掌握度 ${masteryOf(wp)}%</div></div>
       </div>`; }).join('')
     : emptyHTML('📭','暂无记录','点击右上角「录入薄弱点」开始', false);
+
+  typeset(document.getElementById('todayList'));
+  typeset(document.getElementById('recentList'));
 }
 
 /* ============================================================
@@ -1447,6 +1601,7 @@ function renderLibrary(){
   document.getElementById('selectToggle').classList.toggle('btn-primary', ui.selectMode);
   document.getElementById('selectToggle').classList.toggle('btn-ghost', !ui.selectMode);
   updateSelBar();
+  typeset(document.getElementById('wpGrid'));
 }
 
 function starsHTML(n){
@@ -1545,6 +1700,10 @@ function renderReview(){
         <button class="mini-btn" aria-label="详情" onclick="App.openDetail('${wp.id}')">👁</button>
       </div>`; }).join('')
     : '<p style="font-size:13px;color:var(--text2);padding:6px 2px">📅 未来 7 天没有排期</p>';
+
+  typeset(document.getElementById('overdueList'));
+  typeset(document.getElementById('todayReviewList'));
+  typeset(document.getElementById('upcomingList'));
 }
 
 /* ============================================================
@@ -1619,6 +1778,7 @@ function openGradeModal(id){
     </button>`;
   }).join('');
   document.getElementById('gradeModal').classList.add('open');
+  typeset(document.getElementById('gradeTitle'));
 }
 function closeGradeModal(){
   document.getElementById('gradeModal').classList.remove('open');
@@ -1686,7 +1846,10 @@ function openEditModal(id){
     ui.difficulty = 3;
     draft = { questions:[], answers:[] };
   }
+  document.getElementById('f-title-preview').classList.remove('show');
+  document.getElementById('f-desc-preview').classList.remove('show');
   buildStarInput(); syncUploadDOM(); setPasteBucket('questions'); renderDraftThumbs();
+  previewLatex();
   document.getElementById('editModal').classList.add('open');
   setTimeout(() => { const t = document.getElementById('f-title'); if (t) t.focus(); }, 60);
 }
@@ -2135,6 +2298,7 @@ function openDetail(id){
     </div>
     ${(wp.history || []).length ? `<div class="form-label" style="margin-top:18px">🕓 复习记录（最近 ${Math.min(6, wp.history.length)} 次）</div>${histRows}` : ''}`;
   document.getElementById('detailModal').classList.add('open');
+  typeset(document.getElementById('detailBody'));
 }
 function closeDetail(){ document.getElementById('detailModal').classList.remove('open'); ui.detailId = null; }
 function toggleAnswerBlur(){
@@ -2161,6 +2325,7 @@ function updateSelBar(){
   document.getElementById('selBar').classList.toggle('show', ui.selectMode && ui.view === 'library');
   document.getElementById('selCount').textContent = ui.selected.length;
   document.getElementById('selPrint').disabled = !ui.selected.length;
+  document.getElementById('selExport').disabled = !ui.selected.length;
 }
 function selectAll(){
   ui.selected = DB.weakPoints.map(w => w.id);
@@ -2410,7 +2575,10 @@ function refreshPrintUI(rebuildQueue){
   document.getElementById('printGo').innerHTML = `🖨️ 打印（${plan.total} 页）`;
   document.getElementById('printGo').disabled = !plan.total;
   document.getElementById('pqCount').textContent = `${ui.selected.length} 项`;
-  if (rebuildQueue) document.getElementById('printList').innerHTML = pqListHTML();
+  if (rebuildQueue){
+    document.getElementById('printList').innerHTML = pqListHTML();
+    typeset(document.getElementById('printList'));
+  }
   document.getElementById('pvStats').innerHTML =
     `📄 共 <b>${plan.total}</b> 页 · ${printCfg.paper} ${printCfg.orient === 'portrait' ? '纵向' : '横向'} · 每页 ${printCfg.perPage} 图` +
     (plan.total > 8 ? ` · 预览前 8 页` : '');
@@ -2428,6 +2596,7 @@ function renderPrintPreview(plan){
     return `<div class="pv-wrap" style="width:${(w*pxMM*scale).toFixed(1)}px;height:${(h*pxMM*scale).toFixed(1)}px">${buildPageHTML(p, i+1, plan.total, extra)}</div>`;
   }).join('') || `<div style="color:#cbd5e1;font-size:13px;padding:60px 0;text-align:center">暂无可预览页面<br>
     <span style="font-size:11.5px;opacity:.7">请勾选「试题 / 答案」内容，或确认队列中的条目含有附件</span></div>`;
+  typeset(box);
 }
 
 function injectPageStyle(){
@@ -2435,7 +2604,7 @@ function injectPageStyle(){
   if (!st){ st = document.createElement('style'); st.id = 'pageStyle'; document.head.appendChild(st); }
   st.textContent = `@page{size:${printCfg.paper} ${printCfg.orient};margin:0}`;
 }
-function executePrint(){
+async function executePrint(){
   readPrintDOM();
   DB.settings.print = printCfg;
   saveDB();
@@ -2446,9 +2615,15 @@ function executePrint(){
   pa.innerHTML = plan.pages.map((p, i) => buildPageHTML(p, i + 1, plan.total)).join('');
   injectPageStyle();
   closePrintModal();
+  /* LaTeX：#printArea 屏幕端 display:none，先临时离屏可见完成公式排版测量，再进入打印 */
+  if (window.__mjReady){
+    pa.style.cssText = 'display:block;position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;z-index:-1';
+    await typesetWait(pa);
+    pa.style.cssText = '';
+  }
   const imgs = [...pa.querySelectorAll('img')];
-  Promise.all(imgs.map(im => im.complete ? 1 : new Promise(r => { im.onload = r; im.onerror = r; })))
-    .then(() => setTimeout(() => window.print(), 150));
+  await Promise.all(imgs.map(im => im.complete ? 1 : new Promise(r => { im.onload = r; im.onerror = r; })));
+  setTimeout(() => window.print(), 150);
   window.onafterprint = () => { pa.innerHTML = ''; window.onafterprint = null; };
   toast(`🖨️ 已生成 ${plan.total} 页打印内容`, 'success');
 }
@@ -2480,6 +2655,7 @@ function genericClose(mask){
     detailModal: closeDetail,
     gradeModal: closeGradeModal,
     printModal: closePrintModal,
+    dataModal: closeDataModal,
     inputModal: () => closeInputModal(false)
   }[mask.id];
   if (fn){ fn(); return; }
@@ -2532,7 +2708,7 @@ function toast(msg, type = 'info', dur = 2600){
 }
 
 /* ============================================================
-   主题 / 导入导出
+   主题
 ============================================================ */
 function applyTheme(){
   document.documentElement.dataset.theme = DB.settings.theme;
@@ -2542,41 +2718,161 @@ function toggleTheme(){
   DB.settings.theme = DB.settings.theme === 'dark' ? 'light' : 'dark';
   saveDB(); applyTheme();
 }
-function exportData(){
-  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+
+/* ============================================================
+   数据管理：导出 / 导入 / 清空
+============================================================ */
+function openDataModal(){
+  refreshDataModal();
+  document.getElementById('dataModal').classList.add('open');
+}
+function closeDataModal(){
+  document.getElementById('dataModal').classList.remove('open');
+  cancelImport();
+}
+function refreshDataModal(){
+  let att = 0, bytes = 0, reviews = 0;
+  DB.weakPoints.forEach(w => {
+    att += (w.questions || []).length + (w.answers || []).length;
+    reviews += w.sm2.total || 0;
+    [...(w.questions || []), ...(w.answers || [])].forEach(f => bytes += fileSize(f));
+  });
+  let metaBytes = 0;
+  try{ metaBytes = JSON.stringify(buildMeta(DB)).length; }catch(e){}
+  document.getElementById('dmStats').innerHTML = [
+    ['📚', `${DB.weakPoints.length} 个薄弱点`],
+    ['🖼️', `${att} 个附件`],
+    ['💾', `附件约 ${fmtBytes(bytes)}`],
+    ['🔁', `${reviews} 次复习`]
+  ].map(([i,t]) => `<span class="badge" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:6px 12px">${i} ${t}</span>`).join('');
+  document.getElementById('dmFullSize').textContent = '约 ' + fmtBytes(bytes + metaBytes);
+}
+
+function buildExportPayload(wps, light){
+  const strip = f => ({ id: f.id, type: f.type, name: f.name,
+    pageCount: f.type === 'pdf' ? f.pageCount : undefined,
+    srcPages: f.type === 'pdf' ? f.srcPages : undefined });
+  return {
+    meta: { app:'physics-trainer', format:3, light: !!light, exportedAt: Date.now(), count: wps.length },
+    weakPoints: light ? wps.map(wp => ({ ...wp, questions: (wp.questions||[]).map(strip), answers: (wp.answers||[]).map(strip) })) : wps,
+    activity: DB.activity,
+    settings: DB.settings
+  };
+}
+function downloadJSON(obj, name){
+  const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
   const a = document.createElement('a');
   const url = URL.createObjectURL(blob);
   a.href = url;
-  a.download = `物理竞赛备份_${dateKey()}.json`;
+  a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast('📤 备份文件已导出', 'success');
 }
-function importData(input){
-  const file = input.files[0];
-  input.value = '';
+function exportData(mode){
+  const light = mode === 'light';
+  downloadJSON(buildExportPayload(DB.weakPoints, light),
+    `物理竞赛备份_${light ? '精简_' : ''}${dateKey()}.json`);
+  toast(light ? '📄 精简备份已导出（不含附件，导入后仅保留文字与进度）' : '📦 完整备份已导出', 'success', 3000);
+}
+function exportSelected(){
+  const wps = getPrintItems();
+  if (!wps.length){ toast('请先勾选条目', 'warn'); return; }
+  downloadJSON(buildExportPayload(wps, false), `物理竞赛备份_精选${wps.length}项_${dateKey()}.json`);
+  toast(`📤 已导出所选 ${wps.length} 项（含附件）`, 'success');
+}
+
+/* ---- 导入（预览 + 合并/覆盖） ---- */
+let pendingImport = null;
+async function handleImportFile(files){
+  const file = files && files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try{
-      const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data.weakPoints)) throw 0;
-      if (!await confirmDialog(`备份包含 ${data.weakPoints.length} 个薄弱点，导入将覆盖当前全部数据，确定继续？`)) return;
-      DB = {
-        weakPoints: (data.weakPoints || []).map(migrateWP).map(sanitizeWP),
-        activity: data.activity || {},
-        settings: data.settings && typeof data.settings === 'object' ? data.settings : { theme: 'light' }
-      };
-      backfillActivity();
-      ui.upload = Object.assign({maxRes:1800, quality:.85, pdfScale:2}, DB.settings.upload);
-      printCfg = normalizePrintCfg(DB.settings.print);
-      knownFileIds = allFileIds(DB);
-      pendingBlobIds = new Set(allFileIds(DB));
-      saveDB(); applyTheme(); renderAll();
-      toast('📥 数据导入成功', 'success');
-    }catch(_){ toast('导入失败：文件格式不正确', 'error'); }
-  };
-  reader.readAsText(file);
+  const inp = document.getElementById('importFile2');
+  if (inp) inp.value = '';
+  let data;
+  try{ data = JSON.parse(await file.text()); }
+  catch(e){ toast('导入失败：不是有效的 JSON 文件', 'error'); return; }
+  const rawWps = Array.isArray(data) ? data : data.weakPoints;
+  if (!Array.isArray(rawWps)){ toast('导入失败：文件中找不到薄弱点数据', 'error'); return; }
+  const wps = rawWps.map(migrateWP).map(sanitizeWP);
+  const attCount = wps.reduce((n,w) => n + w.questions.length + w.answers.length, 0);
+  const bytes = wps.reduce((s,w) => s + [...w.questions, ...w.answers].reduce((a,f) => a + fileSize(f), 0), 0);
+  pendingImport = { wps, activity: (data && data.activity) || {}, settings: (data && data.settings) || null,
+    meta: (data && data.meta) || null, fileName: file.name, attCount, bytes };
+  showImportPreview();
+}
+function showImportPreview(){
+  const p = pendingImport;
+  if (!p) return;
+  const when = p.meta && p.meta.exportedAt ? fmtFull(p.meta.exportedAt) : '未知时间（旧版备份）';
+  const lightTag = (p.meta && p.meta.light) || (p.wps.length && !p.attCount)
+    ? '<span class="badge" style="background:rgba(245,158,11,.12);color:var(--warn)">📄 精简备份 · 无附件</span>' : '';
+  document.getElementById('impInfo').innerHTML =
+    `📦 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.fileName)}</span>
+     <span style="margin-left:auto;flex:none;color:var(--text2);font-weight:600">${when}</span>`;
+  document.getElementById('impDetail').innerHTML =
+    `<span class="badge" style="background:rgba(79,70,229,.1);color:var(--primary)">📚 ${p.wps.length} 个薄弱点</span>
+     <span class="badge" style="background:rgba(16,185,129,.1);color:var(--success)">🖼️ ${p.attCount} 个附件 · ${fmtBytes(p.bytes)}</span>
+     ${lightTag}`;
+  const merge = document.querySelector('input[name=imp-mode][value=merge]');
+  if (merge) merge.checked = true;
+  document.getElementById('importPreview').style.display = 'block';
+}
+function cancelImport(){
+  pendingImport = null;
+  const box = document.getElementById('importPreview');
+  if (box) box.style.display = 'none';
+  const inp = document.getElementById('importFile2');
+  if (inp) inp.value = '';
+}
+async function confirmImport(){
+  if (!pendingImport) return;
+  const mode = document.querySelector('input[name=imp-mode]:checked').value;
+  const p = pendingImport;
+  if (mode === 'replace'){
+    if (!await confirmDialog(`覆盖导入将用备份中的 ${p.wps.length} 个薄弱点替换当前全部 ${DB.weakPoints.length} 个，且不可恢复。确定继续？`)) return;
+    DB.weakPoints = p.wps;
+    DB.activity = p.activity || {};
+    if (p.settings && typeof p.settings === 'object') DB.settings = Object.assign({}, DB.settings, p.settings);
+    toast(`📥 覆盖导入完成：${p.wps.length} 个薄弱点`, 'success', 3000);
+  } else {
+    const exist = new Set(DB.weakPoints.map(w => w.id));
+    let added = 0, skipped = 0;
+    p.wps.forEach(wp => { if (exist.has(wp.id)) skipped++; else { DB.weakPoints.push(wp); added++; } });
+    Object.keys(p.activity || {}).forEach(k => { DB.activity[k] = Math.max(DB.activity[k] || 0, p.activity[k]); });
+    toast(`📥 合并完成：新增 ${added} 个${skipped ? `，跳过重复 ${skipped} 个` : ''}`, 'success', 3500);
+  }
+  /* 新附件标记为待写入；被替换掉的旧附件由 saveDB → cleanupBlobs 自动清理 */
+  [...allFileIds({ weakPoints: p.wps })].forEach(id => pendingBlobIds.add(id));
+  backfillActivity();
+  ui.upload = Object.assign({maxRes:1800, quality:.85, pdfScale:2}, DB.settings.upload);
+  printCfg = normalizePrintCfg(DB.settings.print);
+  await saveDB();
+  applyTheme();
+  cancelImport();
+  closeDataModal();
+  renderAll();
+}
+
+/* ---- 清空全部数据 ---- */
+async function clearAllData(){
+  if (!await confirmDialog('将永久删除全部薄弱点、附件、复习记录与设置（主题除外），且不可恢复！建议先导出备份。是否继续？')) return;
+  const v = await inputDialog('⚠️ 最终确认：请输入「清空」二字', '');
+  if (v === null) return;
+  if (v.trim() !== '清空'){ toast('已取消：确认文字不匹配', 'warn'); return; }
+  const theme = DB.settings.theme;
+  try{ if (idbAvailable) await idbClearAll(); }
+  catch(e){ console.warn('清空 IndexedDB 失败', e); }
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  DB = { weakPoints: [], activity: {}, settings: { theme } };
+  knownFileIds = new Set();
+  pendingBlobIds = new Set();
+  ui.selected = [];
+  ui.selBackup = null;
+  draft = { questions: [], answers: [] };
+  await saveDB();
+  closeDataModal();
+  renderAll();
+  toast('🗑️ 全部数据已清空', 'success');
 }
 
 /* ============================================================
@@ -2615,11 +2911,28 @@ document.querySelectorAll('.modal-mask').forEach(m =>
     App.handleDrop(e.dataTransfer.files, bucket);
   });
 });
+/* 备份文件拖拽导入 */
+(function(){
+  const idz = document.getElementById('importDrop');
+  if (!idz) return;
+  ['dragover', 'dragenter'].forEach(ev => idz.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); idz.classList.add('drag');
+  }));
+  ['dragleave', 'drop'].forEach(ev => idz.addEventListener(ev, e => {
+    e.preventDefault(); idz.classList.remove('drag');
+  }));
+  idz.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
+    if (e.dataTransfer.files.length) handleImportFile(e.dataTransfer.files);
+  });
+})();
 
 window.App = {
-  switchView, toggleTheme, exportData, importData, requestPersist,
+  switchView, toggleTheme, exportData, exportSelected, requestPersist,
+  openDataModal, closeDataModal, handleImportFile, confirmImport, cancelImport, clearAllData,
   openEditModal, closeEditModal, saveWeakPoint, deleteWP, deleteFromDetail,
   setDifficulty: n => { ui.difficulty = n; buildStarInput(); },
+  previewLatex,
   setUpload, setPasteBucket,
   handleFiles: (input, b) => handleFiles(input, b),
   handleDrop: (files, b) => handleFiles({ files, value: '' }, b),
