@@ -15,7 +15,8 @@ window.MathJax = {
   startup: { typeset: false, ready: () => { MathJax.startup.defaultReady(); window.__mjReady = true; if (window.__mjFlush) window.__mjFlush(); } }
 };
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+<!-- 修复：MathJax 改用 cdnjs（jsdelivr 在部分浏览器跟踪防护下会被拦截存储访问） -->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.js"></script>
 <style>
 :root{
   --primary:#4f46e5; --primary2:#7c3aed; --accent:#06b6d4;
@@ -530,17 +531,17 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
       </div>
       <div class="form-row">
         <div class="form-label">薄弱描述 / 易错分析<span class="latex-tip">∑ 支持 LaTeX 公式</span></div>
-        <textarea class="form-textarea" id="f-desc" placeholder="记录错误原因、关键陷阱、正确思路要点… 可插入公式，如 $\Delta v=a\,\Delta t$、$$\oint\vec{E}\cdot d\vec{l}=-\frac{d\Phi_B}{dt}$$" oninput="App.previewLatex()"></textarea>
+        <textarea class="form-textarea" id="f-desc" placeholder="记录错误原因、关键陷阱、正确思路要点… 可插入公式" oninput="App.previewLatex()"></textarea>
         <div class="latex-preview" id="f-desc-preview"></div>
       </div>
       <div class="form-row">
         <div class="form-label">📝 试题文字内容 <span class="latex-tip">∑ 支持 LaTeX 公式</span></div>
-        <textarea class="form-textarea" id="f-qtext" placeholder="可在此用文字 + LaTeX 录入试题，如：一物体以 $v_0$ 沿斜面下滑，$v=\sqrt{v_0^2+2a s}$。也可留空，仅用下方附件图片/PDF。" oninput="App.previewLatex()"></textarea>
+        <textarea class="form-textarea" id="f-qtext" placeholder="可在此用文字 + LaTeX 录入试题…" oninput="App.previewLatex()"></textarea>
         <div class="latex-preview" id="f-qtext-preview"></div>
       </div>
       <div class="form-row">
         <div class="form-label">✅ 答案内容 <span class="latex-tip">∑ 支持 LaTeX 公式</span></div>
-        <textarea class="form-textarea" id="f-atext" placeholder="录入标准答案与解析（支持公式），展示时默认模糊，可先自测再显示。示例：$$a=\frac{F-f}{m},\quad f=\mu mg\cos\theta$$" oninput="App.previewLatex()"></textarea>
+        <textarea class="form-textarea" id="f-atext" placeholder="录入标准答案与解析（支持公式）…" oninput="App.previewLatex()"></textarea>
         <div class="latex-preview" id="f-atext-preview"></div>
       </div>
       <details class="up-set">
@@ -840,7 +841,7 @@ const MASTERY_BASE = 61;
 const HEAT_LEVELS = [2,4,6];
 const PDF_EST_BYTES_PER_PX = 95;
 const MAX_CANVAS_PIXELS = 16.8e6;
-/* 修复：文本字段上限提升，避免导入/导出往返时静默截断数据 */
+/* 文本字段上限：避免导入/导出往返静默截断数据 */
 const MAX_TEXT = 100000;
 
 const uid = () => { if (window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g,''); return Date.now().toString(36) + Math.random().toString(36).slice(2,8); };
@@ -856,7 +857,9 @@ const catOf = c => CATEGORIES[c] || {color:'#64748b',icon:'📌'};
 const fmtIvl = d => d >= 365 ? ((d/365).toFixed(1).replace(/\.0$/,'')) + ' 年' : d > 30 ? ((d/30.4).toFixed(1).replace(/\.0$/,'')) + ' 个月' : d + ' 天';
 const fmtBytes = b => b >= 1073741824 ? (b/1073741824).toFixed(2) + ' GB' : b >= 1048576 ? (b/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b/1024)) + ' KB';
 const b64len = u => Math.max(0, Math.round((u.length - u.indexOf(',') - 1) * 3 / 4));
-const fileSize = f => f.type === 'pdf' ? f.pages.reduce((s,p) => s + b64len(p), 0) : b64len(f.dataUrl);
+/* 安全封装：获取 PDF 页数组，缺失/非法返回空数组，杜绝 `.length` 崩溃 */
+const pdfPages = f => (f && f.type === 'pdf' && Array.isArray(f.pages)) ? f.pages : [];
+const fileSize = f => f.type === 'pdf' ? pdfPages(f).reduce((s,p) => s + b64len(p), 0) : b64len(f.dataUrl);
 const loadImg = src => new Promise((res,rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
 const structClone = v => (window.structuredClone ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
 
@@ -970,7 +973,8 @@ async function hydrateFiles(db){
   const refs = [];
   db.weakPoints.forEach(wp => { [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => refs.push(f)); });
   const blobs = await idbGetMany([...new Set(refs.map(r => r.id))]);
-  refs.forEach(f => { const b = blobs[f.id]; if (!b) return; if (f.type === 'pdf'){ f.pages = b.pages; f.pageCount = b.pages.length; f.srcPages = f.srcPages || b.pages.length; } else f.dataUrl = b.dataUrl; });
+  /* 修复：blob 读取也做 pages 数组防护，彻底杜绝脏数据崩溃 */
+  refs.forEach(f => { const b = blobs[f.id]; if (!b) return; if (f.type === 'pdf'){ f.pages = Array.isArray(b.pages) ? b.pages : []; f.pageCount = f.pages.length; f.srcPages = f.srcPages || f.pages.length; } else f.dataUrl = b.dataUrl; });
   return db;
 }
 async function flushBlobs(){
@@ -995,7 +999,8 @@ function sm2Step(st, g){
 const isDue = wp => wp.sm2.due <= todayEnd();
 function statusOf(wp){ if (isDue(wp)) return 'due'; if (wp.sm2.ivl >= MATURE_IVL) return 'mastered'; if (wp.sm2.reps > 0) return 'learning'; return 'new'; }
 const masteryOf = wp => wp.sm2.ivl >= 60 ? 100 : Math.round(100 * Math.log(1 + wp.sm2.ivl) / Math.log(MASTERY_BASE));
-const pageCount = files => files.reduce((n,f) => n + (f.type === 'pdf' ? f.pages.length : 1), 0);
+/* 修复：pageCount 增加 files 空值防护，PDF 页数用 pdfPages 安全获取 */
+const pageCount = files => (files || []).reduce((n,f) => n + (f.type === 'pdf' ? pdfPages(f).length : 1), 0);
 
 /* ================= 数据层 ================= */
 function migrateWP(wp){
@@ -1017,7 +1022,7 @@ function backfillActivity(){
 }
 let DB = null;
 const OK_DATAURL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
-/* 修复：上限由 5000 提升至 MAX_TEXT(100000)，防止导入往返静默丢失长文本 */
+/* 上限提升至 MAX_TEXT(100000)，防止导入往返静默丢失长文本 */
 const OK_STR = v => typeof v === 'string' ? v.slice(0, MAX_TEXT) : '';
 const OK_ID = v => /^[a-z0-9]+$/i.test(v) ? v : uid();
 function sanitizeFile(f){
@@ -1056,7 +1061,7 @@ async function loadData(){
   if (!data || !Array.isArray(data.weakPoints)){ try{ const raw = localStorage.getItem(STORE_KEY); if (raw){ data = JSON.parse(raw); legacy = true; } }catch(e){} }
   return { data, legacy, idbMode };
 }
-/* 修复：提供防抖保存队列，供频繁设置（主题/模式/上传）复用 */
+/* 防抖保存队列，供频繁设置（主题/模式/上传）复用 */
 let _saveTimer = null;
 function queueSave(delay = 500){ clearTimeout(_saveTimer); _saveTimer = setTimeout(() => { saveDB(); }, delay); }
 async function saveDB(){
@@ -1536,8 +1541,8 @@ function renderDraftThumbs(){
     document.getElementById(cntId).textContent = files.length ? `（${files.length} 个文件 · ${pageCount(files)} 页 · ${fmtBytes(totalSize)}）` : '';
     let gi = 0;
     document.getElementById(elId).innerHTML = files.map((f,idx) => {
-      const start = gi; gi += f.type === 'pdf' ? f.pages.length : 1;
-      const inner = f.type === 'image' ? `<img draggable="false" src="${f.dataUrl}" loading="lazy" onclick="App.openDraftGallery('${bucket}',${start})">` : `<div class="pdf-cover" onclick="App.openDraftGallery('${bucket}',${start})"><span class="big">📕</span><span>PDF</span><span>${f.pageCount} 页</span></div>`;
+      const start = gi; gi += f.type === 'pdf' ? pdfPages(f).length : 1;
+      const inner = f.type === 'image' ? `<img draggable="false" src="${f.dataUrl}" loading="lazy" onclick="App.openDraftGallery('${bucket}',${start})">` : `<div class="pdf-cover" onclick="App.openDraftGallery('${bucket}',${start})"><span class="big">📕</span><span>PDF</span><span>${pdfPages(f).length} 页</span></div>`;
       return `<div class="thumb" draggable="true" data-bucket="${bucket}" data-idx="${idx}" title="${esc(f.name)}${f.srcPages && f.srcPages !== f.pageCount ? `（原 ${f.srcPages} 页，导入 ${f.pageCount} 页）` : ''} · 拖拽可排序">${inner}<span class="ord">${idx+1}</span><span class="sz">${fmtBytes(fileSize(f))}</span><div class="ops">${f.type==='image'?`<button title="旋转 90°" aria-label="旋转" onclick="event.stopPropagation();App.rotateDraft('${bucket}','${f.id}')">↻</button>`:''}<button title="重命名" aria-label="重命名" onclick="event.stopPropagation();App.renameDraft('${bucket}','${f.id}')">✏️</button><button class="del" title="删除" aria-label="删除" onclick="event.stopPropagation();App.removeDraft('${bucket}','${f.id}')">✕</button></div></div>`;
     }).join('');
   };
@@ -1686,7 +1691,7 @@ function openGallery(srcs, idx){ if (!srcs.length) return; gallery = { imgs: src
 function lbUpdate(){ document.getElementById('lightboxImg').src = gallery.imgs[gallery.idx]; document.getElementById('lbCount').textContent = `${gallery.idx+1} / ${gallery.imgs.length}`; const multi = gallery.imgs.length > 1; document.getElementById('lbPrev').style.display = multi ? 'flex' : 'none'; document.getElementById('lbNext').style.display = multi ? 'flex' : 'none'; }
 function lbNav(d){ if (gallery.imgs.length < 2) return; gallery.idx = (gallery.idx+d+gallery.imgs.length)%gallery.imgs.length; lbUpdate(); }
 function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
-const draftGallerySrcs = bucket => draft[bucket].flatMap(f => f.type === 'pdf' ? f.pages : [f.dataUrl]);
+const draftGallerySrcs = bucket => draft[bucket].flatMap(f => f.type === 'pdf' ? pdfPages(f) : [f.dataUrl]);
 function openDraftGallery(bucket, gi){ openGallery(draftGallerySrcs(bucket), gi); }
 function openDetailGallery(bucket, gi){ openGallery(ui.detailGalleries[bucket] || [], gi); }
 
@@ -1694,8 +1699,9 @@ function openDetailGallery(bucket, gi){ openGallery(ui.detailGalleries[bucket] |
 function filePagesHTML(files, bucketKey){
   const gal = ui.detailGalleries[bucketKey] = [];
   return files.map(f => {
-    const head = `<div class="file-block-title">${f.type==='pdf'?'📕':'🖼️'} ${esc(f.name)}${f.type==='pdf'?`（共 ${f.pageCount} 页）`:''}</div>`;
-    const imgs = (f.type === 'pdf' ? f.pages : [f.dataUrl]).map((src,i) => { const gi = gal.length; gal.push(src); return `${f.type==='pdf'?`<div class="pdf-page-label">第 ${i+1} / ${f.pageCount} 页</div>`:''}<img class="embed-img" src="${src}" loading="lazy" onclick="App.openDetailGallery('${bucketKey}',${gi})">`; }).join('');
+    const head = `<div class="file-block-title">${f.type==='pdf'?'📕':'🖼️'} ${esc(f.name)}${f.type==='pdf'?`（共 ${pdfPages(f).length} 页）`:''}</div>`;
+    /* 修复：PDF 页遍历用 pdfPages 安全获取，缺页时显示空占位而非崩溃 */
+    const imgs = (f.type === 'pdf' ? pdfPages(f) : [f.dataUrl]).map((src,i) => { const gi = gal.length; gal.push(src); return `${f.type==='pdf'?`<div class="pdf-page-label">第 ${i+1} / ${pdfPages(f).length} 页</div>`:''}<img class="embed-img" src="${src}" loading="lazy" onclick="App.openDetailGallery('${bucketKey}',${gi})">`; }).join('');
     return head + imgs;
   }).join('') || '<p style="font-size:13px;color:var(--text2);padding:4px 0 10px">暂无附件</p>';
 }
@@ -1789,7 +1795,8 @@ function slotsOf(wp, label){
   const txt = (isQ ? wp.questionText : wp.answerText) || '';
   const slots = [];
   const imgs = [];
-  files.forEach(f => f.type === 'pdf' ? imgs.push(...f.pages) : imgs.push(f.dataUrl));
+  /* 修复：PDF 页遍历用 pdfPages 安全获取 */
+  files.forEach(f => f.type === 'pdf' ? imgs.push(...pdfPages(f)) : imgs.push(f.dataUrl));
   if (txt.trim()) slots.push({ wp, label, type:'text', text: txt });
   imgs.forEach(src => slots.push({ wp, label, type:'img', src }));
   slots.forEach((s,i) => { s.idx = i+1; s.total = slots.length; });
@@ -2009,9 +2016,9 @@ async function handleImportFile(files){
   try{ data = JSON.parse(await file.text()); }catch(e){ toast('导入失败：不是有效的 JSON 文件', 'error'); return; }
   const rawWps = Array.isArray(data) ? data : data.weakPoints;
   if (!Array.isArray(rawWps)){ toast('导入失败：文件中找不到薄弱点数据', 'error'); return; }
-  /* 修复：检测超长字段截断并提示 */
+  /* 修复：仅对长文本字段统计截断（标题恒定 200 截断属设计行为，不纳入警示） */
   let truncated = 0;
-  const wps = rawWps.map(migrateWP).map(wp => { const s = sanitizeWP(wp); ['title','description','questionText','answerText'].forEach(k => { if (s[k] && String(wp[k]).length > s[k].length) truncated++; }); return s; });
+  const wps = rawWps.map(migrateWP).map(wp => { const s = sanitizeWP(wp); ['description','questionText','answerText'].forEach(k => { if (s[k] && String(wp[k]).length > s[k].length) truncated++; }); return s; });
   if (truncated) toast(`⚠️ 检测到 ${truncated} 处超长文本（超过 ${MAX_TEXT} 字符）将在导入时截断，请检查源文件`, 'warn', 4500);
   const attCount = wps.reduce((n,w) => n + w.questions.length + w.answers.length, 0);
   const bytes = wps.reduce((s,w) => s + [...w.questions, ...w.answers].reduce((a,f) => a + fileSize(f), 0), 0);
