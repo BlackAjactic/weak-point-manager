@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" crossorigin="anonymous"></script>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true, processEnvironments: true },
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true, processEnvironments: true, packages: {'[-]': ['html']} },
   chtml: { scale: 0.96, matchFontHeight: true },
   options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code','input','select','option'] },
   startup: { typeset: false, ready: () => { MathJax.startup.defaultReady(); window.__mjReady = true; if (window.__mjFlush) window.__mjFlush(); } }
@@ -48,6 +48,25 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 input,select,textarea{font-family:inherit;font-size:14px;color:var(--text)}
 img{user-select:none}
 #app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+/* 修复 P3-1：移动端汉堡按钮与侧栏遮罩（默认隐藏，仅在窄屏显示） */
+.hamburger{display:none;position:fixed;top:12px;left:12px;z-index:420;width:42px;height:42px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);font-size:19px;align-items:center;justify-content:center}
+.sidebar-mask{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:390;opacity:0;pointer-events:none;transition:opacity .28s}
+@media (max-width: 860px){
+  #app{grid-template-columns:1fr}
+  #sidebar{position:fixed;inset:0 auto 0 0;width:264px;transform:translateX(-100%);transition:transform .28s;z-index:400;box-shadow:var(--shadow-lg)}
+  #sidebar.open{transform:none}
+  .sidebar-mask.show{display:block;opacity:1;pointer-events:auto}
+  .hamburger{display:flex}
+  #main{padding:64px 14px 90px;max-width:100%}
+  #topbar{flex-direction:column;align-items:stretch}
+  .wp-grid{grid-template-columns:1fr}
+  .ed2-layout,.pe-layout,.print-designer{grid-template-columns:1fr}
+  .modal{max-height:94vh;border-radius:14px}
+  .form-2col{grid-template-columns:1fr}
+}
+@media (max-width: 640px){
+  input,select,textarea{font-size:16px}
+}
 mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:2px 0}
 #sidebar{background:var(--sidebar-bg);color:#e5e7fb;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:22px 16px;z-index:50}
 .logo{display:flex;align-items:center;gap:11px;padding:4px 8px 20px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:18px}
@@ -113,7 +132,10 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 .wp-card.selected .sel-check{background:var(--primary);border-color:var(--primary)}
 .wp-card.selected .sel-check::after{content:"✓"}
 .wp-title{font-size:16px;font-weight:800;line-height:1.4}
-.wp-desc{font-size:13px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wp-desc{font-size:13px;color:var(--text2);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* ★ 来源小字 */
+.wp-src{font-size:11.5px;color:var(--accent);font-weight:600;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.form-hint{font-size:10.5px;color:var(--text2);font-weight:500}
 .wp-attach{display:flex;gap:12px;font-size:12px;color:var(--text2);flex-wrap:wrap}
 .wp-attach b{color:var(--text)}
 .pbar{height:7px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;overflow:hidden}
@@ -239,6 +261,8 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 .thumb .pdf-cover{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:linear-gradient(135deg,#fef2f2,#fff7ed);color:#dc2626;font-size:11px;font-weight:800;cursor:zoom-in}
 [data-theme="dark"] .thumb .pdf-cover{background:linear-gradient(135deg,#3f1d1d,#422006);color:#fca5a5}
 .thumb .pdf-cover .big{font-size:24px}
+.thumb .pdf-cover.missing{background:linear-gradient(135deg,#fffbeb,#fef3c7);color:#b45309;cursor:pointer}
+[data-theme="dark"] .thumb .pdf-cover.missing{background:linear-gradient(135deg,#3a2a10,#442b07);color:#fbbf24}
 .thumb .ord{position:absolute;top:4px;left:4px;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:rgba(15,23,42,.72);color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .thumb .sz{position:absolute;top:4px;right:4px;background:rgba(15,23,42,.6);color:#fff;font-size:9px;padding:2px 6px;border-radius:6px;font-weight:700}
 .thumb .ops{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:5px;padding:16px 3px 6px;background:linear-gradient(transparent,rgba(15,23,42,.78));opacity:0;transition:opacity .2s}
@@ -473,6 +497,8 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
   </aside>
 
   <main id="main">
+    <button class="hamburger" id="hamburger" aria-label="打开菜单" aria-expanded="false">☰</button>
+    <div id="sidebarMask" class="sidebar-mask"></div>
     <div id="topbar">
       <div><h1 id="viewTitle">仪表盘</h1><p id="viewSubtitle"></p></div>
       <div style="display:flex;gap:9px;flex-wrap:wrap">
@@ -508,7 +534,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 
     <section class="view" id="view-library">
       <div class="toolbar">
-        <div class="search-box"><input id="searchInput" placeholder="搜索标题或描述…" oninput="App.onSearch(this.value)"></div>
+        <div class="search-box"><input id="searchInput" placeholder="搜索标题 / 描述 / 来源…" oninput="App.onSearch(this.value)"></div>
         <select class="tool-select" id="statusFilter" onchange="App.onFilter()">
           <option value="all">全部状态</option><option value="due">🔴 待复习</option>
           <option value="new">🆕 新录入</option><option value="learning">📖 学习中</option>
@@ -517,6 +543,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
         <select class="tool-select" id="sortSelect" onchange="App.onFilter()">
           <option value="smart">智能排序</option><option value="new">最新创建</option>
           <option value="diff">难度优先</option><option value="mastery">掌握度升序</option>
+          <option value="source">📌 按来源（A–Z）</option>
         </select>
         <button class="btn btn-ghost" id="selectToggle" onclick="App.toggleSelectMode()">☑ 多选管理</button>
       </div>
@@ -583,6 +610,15 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
         <input class="form-input" id="f-title" placeholder="例：斜面模型摩擦力方向判断 $f=\mu mg\cos\theta$" oninput="App.previewLatex()">
         <div class="latex-preview" id="f-title-preview"></div>
       </div>
+      <div class="form-row">
+        <div class="form-label">📌 题目来源 <span class="form-hint">可输入或从历史来源中选择</span></div>
+        <input class="form-input" id="f-source" list="sourceList" placeholder="例：2023 全国中学生物理竞赛预赛 第12题 · 《培优》P.86">
+        <datalist id="sourceList"></datalist>
+      </div>
+      <div class="form-row" id="sourceQuickRow" style="display:none">
+        <div class="form-label">↩ 常用来源</div>
+        <div class="chip-grp" id="sourceQuick"></div>
+      </div>
       <div class="form-2col">
         <div class="form-row"><div class="form-label">知识分类</div><select class="form-select" id="f-category"></select></div>
         <div class="form-row"><div class="form-label">难度等级</div><div class="star-input" id="starInput" role="radiogroup" aria-label="难度等级"></div></div>
@@ -627,7 +663,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
             <button class="mini-btn del" title="清空全部附件" aria-label="清空试题附件" onclick="App.clearDraft('questions')">🗑️</button>
           </span>
         </div>
-        <div class="dropzone" id="dropQ" onclick="App.setPasteBucket('questions');document.getElementById('fileQ').click()">
+        <div class="dropzone" id="dropQ" role="button" tabindex="0" aria-label="选择或拖拽试题附件" onclick="App.setPasteBucket('questions');document.getElementById('fileQ').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
           <span class="dz-ico">📤</span>点击选择 / 拖拽文件到此
           <span class="dz-hint">支持图片与 PDF（PDF 可选页导入）· 可批量多选 · 也可直接 Ctrl+V 粘贴截图</span>
         </div>
@@ -644,7 +680,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
             <button class="mini-btn del" title="清空全部附件" aria-label="清空答案附件" onclick="App.clearDraft('answers')">🗑️</button>
           </span>
         </div>
-        <div class="dropzone" id="dropA" onclick="App.setPasteBucket('answers');document.getElementById('fileA').click()">
+        <div class="dropzone" id="dropA" role="button" tabindex="0" aria-label="选择或拖拽答案附件" onclick="App.setPasteBucket('answers');document.getElementById('fileA').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
           <span class="dz-ico">📤</span>点击选择 / 拖拽文件到此
           <span class="dz-hint">支持图片与 PDF（PDF 可选页导入）· 可批量多选 · 也可直接 Ctrl+V 粘贴截图</span>
         </div>
@@ -706,7 +742,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
         <button class="btn btn-ghost" onclick="App.exportData('light')">📄 精简备份<small>仅文字与复习进度 · 体积极小</small></button>
       </div>
       <div class="form-label" style="margin-top:22px">📥 导入备份</div>
-      <div class="dropzone" id="importDrop" onclick="document.getElementById('importFile2').click()">
+      <div class="dropzone" id="importDrop" role="button" tabindex="0" aria-label="选择或拖拽备份文件" onclick="document.getElementById('importFile2').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
         <span class="dz-ico">📂</span>点击选择 / 拖拽备份文件到此
         <span class="dz-hint">选择后将弹出窗口，逐条预览并可<b>勾选部分内容导入</b>（支持合并 / 覆盖）</span>
       </div>
@@ -1082,7 +1118,7 @@ mjx-container[jax="CHTML"][display="true"]{overflow-x:auto;overflow-y:hidden;max
 
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" onclick="if(event.target===this)App.closeLightbox()">
   <button class="lb-nav lb-prev" id="lbPrev" aria-label="上一张" onclick="event.stopPropagation();App.lbNav(-1)">‹</button>
-  <img id="lightboxImg" onclick="event.stopPropagation()">
+  <img id="lightboxImg" alt="附件大图预览" onclick="event.stopPropagation()">
   <button class="lb-nav lb-next" id="lbNext" aria-label="下一张" onclick="event.stopPropagation();App.lbNav(1)">›</button>
   <div id="lbCount"></div>
   <button class="lb-close" onclick="event.stopPropagation();App.closeLightbox()" aria-label="关闭">✕</button>
@@ -1120,9 +1156,14 @@ const todayEnd = () => { const d = new Date(); d.setHours(23,59,59,999); return 
 const catOf = c => CATEGORIES[c] || {color:'#64748b',icon:'📌'};
 const fmtIvl = d => d >= 365 ? ((d/365).toFixed(1).replace(/\.0$/,'')) + ' 年' : d > 30 ? ((d/30.4).toFixed(1).replace(/\.0$/,'')) + ' 个月' : d + ' 天';
 const fmtBytes = b => b >= 1073741824 ? (b/1073741824).toFixed(2) + ' GB' : b >= 1048576 ? (b/1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b/1024)) + ' KB';
-const b64len = u => Math.max(0, Math.round((u.length - (u.startsWith('data:') ? u.indexOf(',') : -1) - 1) * 3 / 4));
+const b64len = u => (typeof u === 'string')
+  ? Math.max(0, Math.round((u.length - (u.startsWith('data:') ? u.indexOf(',') : -1) - 1) * 3 / 4)) : 0;
 const pdfPages = f => (f && f.type === 'pdf' && Array.isArray(f.pages)) ? f.pages : [];
-const fileSize = f => f.type === 'pdf' ? (typeof f.bytes === 'string' ? b64len(f.bytes) : (pdfPages(f)[0] ? pdfPages(f).reduce((s,p) => s + b64len(p), 0) : 0)) : b64len(f.dataUrl);
+const fileSize = f => { try{
+  if (!f || f.type !== 'pdf') return b64len(f && f.dataUrl);
+  return (typeof f.bytes === 'string' ? b64len(f.bytes) : 0)
+       + pdfPages(f).reduce((s,p) => s + b64len(p), 0);
+}catch(_){ return 0; } };
 const loadImg = src => new Promise((res,rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; });
 const structClone = v => (window.structuredClone ? structuredClone(v) : JSON.parse(JSON.stringify(v)));
 const b64ToU8 = b64 => { const bin = atob(b64); const u = new Uint8Array(bin.length); for (let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; };
@@ -1165,7 +1206,14 @@ function previewLatex(){
 /* ================= 存储引擎（含 PDF bytes） ================= */
 const IDB_NAME = 'physics_trainer_idb', IDB_STORE = 'kv', IDB_FILES = 'files', IDB_VERSION = 2;
 let idbAvailable = true, _idbPromise = null, lsFallbackNotified = false;
-let pendingBlobIds = new Set(), knownFileIds = new Set();
+let pendingBlobs = new Map(), knownFileIds = new Set();
+/* 登记待落盘附件：add 时即固化内容快照（缺陷 C 方案 1），避免 draft 未入库或图片被编辑后丢失 */
+function markPending(f){
+  if (!f || !f.id) return;
+  if (f.type === 'pdf') pendingBlobs.set(f.id, { id: f.id, pages: Array.isArray(f.pages) ? f.pages : [], bytes: (typeof f.bytes === 'string') ? f.bytes : undefined });
+  else if (f.type === 'image' && typeof f.dataUrl === 'string') pendingBlobs.set(f.id, { id: f.id, dataUrl: f.dataUrl });
+}
+function unmarkPending(id){ pendingBlobs.delete(id); }
 function idbOpen(){
   if (_idbPromise) return _idbPromise;
   _idbPromise = new Promise((res,rej) => {
@@ -1186,6 +1234,20 @@ async function idbPutBlob(id,val){ const db=await idbOpen(); return new Promise(
 async function idbDeleteBlob(id){ const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction(IDB_FILES,'readwrite'); tx.objectStore(IDB_FILES).delete(id); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
 async function idbGetMany(ids){ if(!ids.length) return {}; const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction(IDB_FILES,'readonly'); const store=tx.objectStore(IDB_FILES); const out={}; ids.forEach(k=>{ const rq=store.get(k); rq.onsuccess=()=>{ if(rq.result) out[k]=rq.result; }; }); tx.oncomplete=()=>res(out); tx.onerror=()=>rej(tx.error); }); }
 async function idbClearAll(){ const db=await idbOpen(); return new Promise((res,rej)=>{ const tx=db.transaction([IDB_STORE,IDB_FILES],'readwrite'); tx.objectStore(IDB_STORE).clear(); tx.objectStore(IDB_FILES).clear(); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+async function idbGetAllKeys(){ const db=await idbOpen(); return new Promise((res,rej)=>{ const rq=db.transaction(IDB_FILES,'readonly').objectStore(IDB_FILES).getAllKeys(); rq.onsuccess=()=>res(rq.result||[]); rq.onerror=()=>rej(rq.error); }); }
+/* 单事务原子写：附件先写、元数据后写，任一失败整体回滚，不产生"有引用无内容"的幽灵附件 */
+async function persistAtomic(meta, blobs, deletes){
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction([IDB_STORE, IDB_FILES], 'readwrite');
+    const files = tx.objectStore(IDB_FILES), kv = tx.objectStore(IDB_STORE);
+    for (const rec of blobs) files.put(rec, rec.id);
+    for (const id of deletes) files.delete(id);
+    kv.put(meta, STORE_KEY);
+    tx.oncomplete = () => res();
+    tx.onerror = tx.onabort = () => rej(tx.error);
+  });
+}
 function buildMeta(db){ return { ...db, weakPoints: db.weakPoints.map(wp => ({ ...wp,
   questions: (wp.questions || []).map(fileRef).filter(Boolean),
   answers: (wp.answers || []).map(fileRef).filter(Boolean) })) }; }
@@ -1193,38 +1255,71 @@ function collectFiles(db){
   const map = {};
   db.weakPoints.forEach(wp => { [...(wp.questions || []), ...(wp.answers || [])].forEach(f => {
     if (!f || !f.id) return;
+    /* 修复：基于引用存在（id+type）收集，而非依赖 dataUrl/pages 内容。
+       否则附件未 hydrate 时（dataUrl undefined）会被 deletes 逻辑误删 blob */
     if (f.type === 'pdf') map[f.id] = { id: f.id, pages: Array.isArray(f.pages) ? f.pages : [], bytes: (typeof f.bytes === 'string') ? f.bytes : undefined };
-    else if (f.type === 'image' && typeof f.dataUrl === 'string') map[f.id] = { id: f.id, dataUrl: f.dataUrl };
+    else if (f.type === 'image') map[f.id] = { id: f.id, dataUrl: (typeof f.dataUrl === 'string') ? f.dataUrl : undefined };
   }); });
   return map;
 }
 function allFileIds(db){ const s=new Set(); db.weakPoints.forEach(wp => [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => f && f.id && s.add(f.id))); return s; }
-async function hydrateFiles(db){
-  if (!idbAvailable) return db;
-  const refs = [];
-  db.weakPoints.forEach(wp => { [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => refs.push(f)); });
+/* 修复 P0-5：按需 hydrate——打开详情/编辑时才取该条目的附件，避免启动时全量驻留 JS 堆 */
+async function hydrateWP(wp){
+  if (!idbAvailable || !wp || wp.__hydrated) return wp;
+  const refs = [...(wp.questions||[]), ...(wp.answers||[])];
   const blobs = await idbGetMany([...new Set(refs.map(r => r.id))]);
-  refs.forEach(f => { const b = blobs[f.id]; if (!b) return;
+  refs.forEach(f => { const b = blobs[f.id];
+    if (!b){ f.missing = true; return; }
     if (f.type === 'pdf'){ f.pages = Array.isArray(b.pages) ? b.pages : []; if (typeof b.bytes === 'string') f.bytes = b.bytes; f.pageCount = f.pages.length; f.srcPages = f.srcPages || f.pages.length; }
     else f.dataUrl = b.dataUrl; });
-  return db;
+  wp.__hydrated = true;
+  return wp;
 }
-async function flushBlobs(){ if(!pendingBlobIds.size) return; const map=collectFiles(DB); for(const id of [...pendingBlobIds]){ const f=map[id]; if(f){ await idbPutBlob(id,f); knownFileIds.add(id); } pendingBlobIds.delete(id); } }
-async function cleanupBlobs(){ const map=collectFiles(DB); for(const id of [...knownFileIds]){ if(!map[id]){ try{ await idbDeleteBlob(id); }catch(_){} knownFileIds.delete(id); } } }
+/* 修复缺陷 E：启动完整性审计，显式告警缺失附件 */
+/* 修复缺陷 E + P0-5：启动完整性审计——基于 IDB 实际 blob 判断（而非内存 dataUrl，避免按需 hydrate 误报） */
+async function auditIntegrity(){
+  if (!idbAvailable) return;
+  const refs = [];
+  DB.weakPoints.forEach(wp => ['questions','answers'].forEach(k =>
+    (wp[k]||[]).forEach(f => refs.push(f))));
+  if (!refs.length) return;
+  const blobs = await idbGetMany([...new Set(refs.map(r => r.id))]);
+  let bad = 0;
+  refs.forEach(f => {
+    const b = blobs[f.id];
+    const ok = b && (f.type === 'pdf' ? (Array.isArray(b.pages) && b.pages.length) : typeof b.dataUrl === 'string');
+    if (!ok){ f.missing = true; bad++; }
+  });
+  if (bad) setTimeout(()=>toast(`⚠️ 检测到 ${bad} 个附件数据缺失（条目与文字完好），请在编辑中重新上传`,'error',8000), 900);
+}
+async function flushBlobs(){
+  if (!pendingBlobs.size) return;
+  const blobs = [...pendingBlobs.values()];
+  for (const rec of blobs){ await idbPutBlob(rec.id, rec); knownFileIds.add(rec.id); pendingBlobs.delete(rec.id); }
+}
+/* 以 IDB files 表实际键为准做 GC，避免 knownFileIds 为空时孤儿永不回收 / 被错误填充时误删 */
+async function cleanupBlobs(){
+  const map = collectFiles(DB);
+  const keys = await idbGetAllKeys();
+  for (const id of keys){ if (!map[id]){ try{ await idbDeleteBlob(id); }catch(_){} knownFileIds.delete(id); } }
+}
 
 /* ================= SM-2 ================= */
 function newSM2(){ return { ef:2.5, ivl:0, reps:0, due:Date.now(), total:0, lapses:0 }; }
 function sm2Step(st, g){
   const ef=st.ef, ivl=st.ivl, reps=st.reps;
   if (g === 0) return { ef: Math.max(1.3, ef-.2), ivl: 1, reps: 0 };
-  if (g === 1) return { ef: Math.max(1.3, ef-.15), ivl: Math.max(1, Math.round((ivl||1)*1.2)), reps: reps+1 };
+  if (g === 1) return { ef: Math.max(1.3, ef-.15), ivl: Math.max(1, Math.ceil((ivl||1)*1.2)), reps: reps+1 };
   if (g === 2) return { ef, ivl: reps === 0 ? 1 : Math.max(1, Math.round(ivl*ef)), reps: reps+1 };
   return { ef: ef+.15, ivl: reps === 0 ? 4 : Math.max(2, Math.round(ivl*ef*1.3)), reps: reps+1 };
 }
 const isDue = wp => wp.sm2.due <= todayEnd();
-function statusOf(wp){ if (isDue(wp)) return 'due'; if (wp.sm2.ivl >= MATURE_IVL) return 'mastered'; if (wp.sm2.reps > 0) return 'learning'; return 'new'; }
+/* 修复 P1-9：把"是否到期"与"是否成熟"拆成正交维度，统一口径 */
+const isMature = wp => wp.sm2.ivl >= MATURE_IVL;
+function statusOf(wp){ if (isDue(wp)) return 'due'; if (isMature(wp)) return 'mastered'; if (wp.sm2.reps > 0) return 'learning'; return 'new'; }
 const masteryOf = wp => wp.sm2.ivl >= 60 ? 100 : Math.round(100 * Math.log(1 + wp.sm2.ivl) / Math.log(MASTERY_BASE));
-const pageCount = files => (files || []).reduce((n,f) => n + (f.type === 'pdf' ? pdfPages(f).length : 1), 0);
+/* 修复：未 hydrate 的 PDF 附件只有 pageCount（fileRef 保存），pdfPages() 返回空数组导致卡片显示 0 页；回退到 f.pageCount */
+const countPages = files => (files || []).reduce((n,f) => n + (f.type === 'pdf' ? (pdfPages(f).length || f.pageCount || 0) : 1), 0);
 
 /* ================= 数据层 ================= */
 function migrateWP(wp){
@@ -1245,7 +1340,8 @@ function backfillActivity(){
   for (const k in cnt) DB.activity[k] = Math.max(DB.activity[k]||0, cnt[k]);
 }
 let DB = null;
-const OK_DATAURL = /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+/* 修复：兼容旧版备份中的 GIF 附件，避免导入时被静默丢弃 */
+const OK_DATAURL = /^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/;
 const OK_B64 = /^[A-Za-z0-9+/=]+$/;
 const OK_STR = v => typeof v === 'string' ? v.slice(0, MAX_TEXT) : '';
 const OK_ID = v => /^[a-z0-9]+$/i.test(v) ? v : uid();
@@ -1259,12 +1355,16 @@ function sanitizeFile(f){
     const bytes = (typeof f.bytes === 'string' && OK_B64.test(f.bytes) && f.bytes.length > 24) ? f.bytes : undefined;
     return { id, type:'pdf', name, pages: f.pages, pageCount: f.pages.length, srcPages, ...(bytes ? { bytes } : {}) };
   }
+  /* 修复 P0-3：精简备份/幽灵引用保留占位而非丢弃，便于合并时补内容 */
+  if (f.type === 'image' && !f.dataUrl) return { id, type:'image', name, missing:true };
+  if (f.type === 'pdf' && !Array.isArray(f.pages)) return { id, type:'pdf', name, missing:true };
   return null;
 }
 function sanitizeWP(wp){
   return {
     id: OK_ID(wp && wp.id),
     title: String(OK_STR(wp && wp.title)).slice(0,200),
+    source: String(OK_STR(wp && wp.source)).slice(0,200),
     category: CATEGORIES[wp && wp.category] ? wp.category : '其他',
     difficulty: Math.min(5, Math.max(1, +((wp && wp.difficulty) || 3))),
     description: OK_STR(wp && wp.description),
@@ -1282,22 +1382,47 @@ function sanitizeWP(wp){
 }
 async function loadData(){
   let legacy = false, data, idbMode = false;
-  if (idbAvailable){ try{ data = await idbGet(STORE_KEY); if (data && Array.isArray(data.weakPoints)){ data = await hydrateFiles(data); idbMode = true; } }catch(e){ console.warn('IndexedDB 读取失败，降级 localStorage', e); idbAvailable = false; } }
+  if (idbAvailable){ try{ data = await idbGet(STORE_KEY); if (data && Array.isArray(data.weakPoints)){ idbMode = true; } }catch(e){ console.warn('IndexedDB 读取失败，降级 localStorage', e); idbAvailable = false; } }
   if (!data || !Array.isArray(data.weakPoints)){ try{ const raw = localStorage.getItem(STORE_KEY); if (raw){ data = JSON.parse(raw); legacy = true; } }catch(e){} }
   return { data, legacy, idbMode };
 }
 let _saveTimer = null;
 function queueSave(delay = 500){ clearTimeout(_saveTimer); _saveTimer = setTimeout(() => { saveDB(); }, delay); }
-async function saveDB(){
-  try{ localStorage.setItem(THEME_KEY, DB.settings.theme); }catch(e){}
-  let mode = 'ls';
-  if (idbAvailable){ try{ await idbSet(STORE_KEY, buildMeta(DB)); await flushBlobs(); await cleanupBlobs(); mode = 'idb'; }catch(e){ console.warn('IndexedDB 写入失败，降级 localStorage', e); idbAvailable = false; } }
-  if (mode === 'ls' && !lsFallbackNotified){ lsFallbackNotified = true; toast('⚠️ 当前浏览器不支持大容量存储，已回退兼容模式（约 5MB），建议更换现代浏览器', 'warn', 5000); }
-  try{ if (mode === 'ls') localStorage.setItem(STORE_KEY, JSON.stringify(DB)); }
-  catch(e){ console.error(e); toast('⚠️ 保存失败：存储空间不足！请「导出」备份后删除部分附件', 'error', 5000); return 'err'; }
-  renderStorage();
-  return mode;
+/* 串行化保存：消除并发 saveDB 交错互删 pending 的竞态 */
+let _saveChain = Promise.resolve(), _inFlight = 0;
+/* 修复：页面切到后台/隐藏时立即落盘未保存的变更，避免关闭标签页时防抖队列未 flush 导致附件丢失 */
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'&&_saveTimer){ clearTimeout(_saveTimer); _saveTimer=null; saveDB(); }
+});
+function saveDB(){ return (_saveChain = _saveChain.then(_saveDBInner, _saveDBInner)); }
+async function _saveDBInner(){
+  _inFlight++;
+  try{
+    try{ localStorage.setItem(THEME_KEY, DB.settings.theme); }catch(e){}
+    let mode = 'ls';
+    if (idbAvailable){
+      try{
+        const meta = buildMeta(DB);
+        const blobs = [...pendingBlobs.values()];
+        const deletes = [];
+        const map = collectFiles(DB);
+        const keys = await idbGetAllKeys();
+        for (const id of keys){ if (!map[id]) deletes.push(id); }
+        await persistAtomic(meta, blobs, deletes);
+        for (const rec of blobs){ knownFileIds.add(rec.id); pendingBlobs.delete(rec.id); }
+        mode = 'idb';
+      }catch(e){ console.warn('IndexedDB 写入失败，降级 localStorage', e); idbAvailable = false; }
+    }
+    if (mode === 'ls' && !lsFallbackNotified){ lsFallbackNotified = true; toast('⚠️ 当前浏览器不支持大容量存储，已回退兼容模式（约 5MB），建议更换现代浏览器', 'warn', 5000); }
+    try{ if (mode === 'ls') localStorage.setItem(STORE_KEY, JSON.stringify(buildMeta(DB))); }
+    catch(e){ console.error(e); toast('⚠️ 保存失败：存储空间不足！请「导出」备份后删除部分附件', 'error', 5000); return 'err'; }
+    renderStorage();
+    return mode;
+  } finally { _inFlight--; }
 }
+window.addEventListener('beforeunload', e => {
+  if (_inFlight > 0){ e.preventDefault(); e.returnValue = '附件正在保存，确定离开吗？'; }
+});
 function logActivity(){ const k = dateKey(); DB.activity[k] = (DB.activity[k]||0)+1; }
 function calcStreak(){
   const has = t => (DB.activity[dateKey(new Date(t))]||0) > 0;
@@ -1335,8 +1460,14 @@ function syncFilterDOM(){
   const stSel = document.getElementById('statusFilter');
   if (!stSel) return;
   const browse = isBrowse();
+  const want = browse ? 'browse' : 'study';
+  /* 修复 P1-1：形态未变时绝不触碰用户选择 */
+  if (stSel.dataset.mode === want) return;
+  const prev = stSel.value;
   stSel.innerHTML = '<option value="all">全部状态</option>' + (browse ? '' : '<option value="due">🔴 待复习</option><option value="new">🆕 新录入</option><option value="learning">📖 学习中</option><option value="mastered">🏆 已熟练</option>');
-  stSel.disabled = browse; stSel.value = 'all';
+  stSel.dataset.mode = want;
+  stSel.value = stSel.querySelector(`option[value="${prev}"]`) ? prev : 'all';
+  stSel.disabled = browse;
 }
 let _lastStorageRender = 0;
 function renderAll(){
@@ -1366,7 +1497,7 @@ async function renderStorage(){
       return;
     }
   }catch(e){}
-  let bytes=0; try{ for(let k in localStorage) bytes+=(localStorage.getItem(k)||'').length*2; }catch(e){}
+  let bytes=0; try{ Object.keys(localStorage).forEach(k=>bytes+=(localStorage.getItem(k)||'').length*2); }catch(e){}
   const mb=bytes/1048576,quota=5;
   el.textContent=`存储占用 ${mb.toFixed(1)} MB / ~${quota} MB（兼容模式）`;
   bar.style.width=Math.min(100,mb/quota*100)+'%'; bar.style.background=mb/quota>.8?'#f43f5e':'';
@@ -1398,14 +1529,26 @@ function heatmapHTML(weeks,mini){
     if(t>t0){ cells+='<span class="heat-cell hc-future"></span>'; continue; }
     const n=DB.activity[dateKey(new Date(t))]||0;
     const lv=n===0?0:n<=HEAT_LEVELS[0]?1:n<=HEAT_LEVELS[1]?2:n<=HEAT_LEVELS[2]?3:4;
-    cells+=`<span class="heat-cell lv${lv}" data-tip="${n} 次复习 · ${fmtFull(t)}"></span>`; }
+    /* 修复 P3-7：tabindex + aria-label 让触屏/键盘用户可读数值 */
+    cells+=`<span class="heat-cell lv${lv}" data-tip="${n} 次复习 · ${fmtFull(t)}" tabindex="0" aria-label="${fmtFull(t)} 复习 ${n} 次"></span>`; }
   let months='';
-  if(!mini){ let prev=-1; for(let c=0;c<weeks;c++){ const d=new Date(addDays(start,c*7)); if(d.getMonth()!==prev){ months+=`<span style="grid-column:${c+1}">${d.getMonth()+1}月</span>`; prev=d.getMonth(); } } }
+  if(!mini){ let prev=-1; for(let c=0;c<weeks;c++){ const d=new Date(addDays(start,c*7)); if(d.getMonth()!==prev){ /* 修复：桌面版月份行前有「周标」2 列（9px 6px），月份标签需从第 3 列起排，否则整体左移一列 */ months+=`<span style="grid-column:${c+3}">${d.getMonth()+1}月</span>`; prev=d.getMonth(); } } }
   const wdays=mini?'':`<div class="heat-wdays">${['日','一','二','三','四','五','六'].map((w,i)=>`<span>${i%2?w:''}</span>`).join('')}</div>`;
-  return `<div class="heat ${mini?'mini':''}">${months?`<div class="heat-months" style="grid-template-columns:repeat(${weeks},calc(var(--hsz) + var(--hgap)))">${months}</div>`:''}<div class="heat-wrap">${wdays}<div class="heat-grid">${cells}</div></div></div>`;
+  return `<div class="heat ${mini?'mini':''}">${months?`<div class="heat-months" style="grid-template-columns:${mini?'':`9px 6px `}repeat(${weeks},calc(var(--hsz) + var(--hgap)))">${months}</div>`:''}<div class="heat-wrap">${wdays}<div class="heat-grid">${cells}</div></div></div>`;
 }
 const heatTip=document.getElementById('heatTip');
-document.addEventListener('mousemove',e=>{ const c=e.target.closest?e.target.closest('.heat-cell[data-tip]'):null; if(!c){ heatTip.style.display='none'; return; } heatTip.textContent=c.dataset.tip; heatTip.style.display='block'; heatTip.style.left=Math.min(e.clientX+12,window.innerWidth-180)+'px'; heatTip.style.top=Math.max(8,e.clientY-38)+'px'; if(!e.target.closest('.heat-cell')) heatTip.style.display='none'; });
+/* 修复 P2-2：热力图 tooltip 用 mouseover/mouseout 事件委托，避免全局 mousemove 每次移动都做 closest 匹配 */
+document.addEventListener('mouseover',e=>{
+  const c=e.target.closest?e.target.closest('.heat-cell[data-tip]'):null;
+  if(!c) return;
+  heatTip.textContent=c.dataset.tip; heatTip.style.display='block';
+  const r=c.getBoundingClientRect();
+  heatTip.style.left=Math.min(r.left,window.innerWidth-180)+'px';
+  heatTip.style.top=Math.max(8,r.top-8)+'px';
+});
+document.addEventListener('mouseout',e=>{
+  if(e.target.closest&&e.target.closest('.heat-cell[data-tip]')) heatTip.style.display='none';
+});
 
 /* ================= 渲染：仪表盘 ================= */
 function renderDashboard(){
@@ -1473,8 +1616,8 @@ function renderLibrary(){
   const browse=isBrowse();
   let list=DB.weakPoints.filter(wp=>(ui.filterCat==='all'||wp.category===ui.filterCat)
     &&(stF==='all'||(browse?true:statusOf(wp)===stF))
-    &&(!kw||wp.title.toLowerCase().includes(kw)||(wp.description||'').toLowerCase().includes(kw)||(wp.questionText||'').toLowerCase().includes(kw)||(wp.answerText||'').toLowerCase().includes(kw)));
-  const sorters={smart:(a,b)=>(isDue(a)?0:1)-(isDue(b)?0:1)||a.sm2.due-b.sm2.due,new:(a,b)=>b.createdAt-a.createdAt,diff:(a,b)=>b.difficulty-a.difficulty,mastery:(a,b)=>masteryOf(a)-masteryOf(b)};
+    &&(!kw||wp.title.toLowerCase().includes(kw)||(wp.source||'').toLowerCase().includes(kw)||(wp.description||'').toLowerCase().includes(kw)||(wp.questionText||'').toLowerCase().includes(kw)||(wp.answerText||'').toLowerCase().includes(kw)));
+  const sorters={smart:(a,b)=>(isDue(a)?0:1)-(isDue(b)?0:1)||a.sm2.due-b.sm2.due,new:(a,b)=>b.createdAt-a.createdAt,diff:(a,b)=>b.difficulty-a.difficulty,mastery:(a,b)=>masteryOf(a)-masteryOf(b),source:(a,b)=>{const x=a.source||'',y=b.source||'';return (!!x===!!y)?x.localeCompare(y,'zh'):(x?-1:1);}};
   list.sort(sorters[sort]||sorters.smart);
   document.getElementById('wpGrid').innerHTML=list.map(cardHTML).join('');
   document.getElementById('wpGrid').classList.toggle('select-mode',ui.selectMode);
@@ -1486,14 +1629,15 @@ function renderLibrary(){
 function starsHTML(n){ return `<span class="stars">${'★'.repeat(n)}<span class="off">${'★'.repeat(5-n)}</span></span>`; }
 function cardHTML(wp){
   const c=catOf(wp.category),st=statusOf(wp),m=masteryOf(wp),due=isDue(wp),browse=isBrowse();
-  const qc=pageCount(wp.questions),ac=pageCount(wp.answers);
+  const qc=countPages(wp.questions),ac=countPages(wp.answers);
   const hasQText=!!(wp.questionText&&wp.questionText.trim()),hasAText=!!(wp.answerText&&wp.answerText.trim());
   const selected=ui.selected.includes(wp.id);
-  const dueLabel=!browse&&due?`<span class="next-due due">⚡ ${wp.sm2.total?'复习到期':'首次学习待进行'}</span>`:`<span class="next-due ${st==='mastered'&&!browse?'ok':''}">${st==='mastered'&&!browse?'🏆 熟练 · ':''}${browse?'题库条目 · ':''}${browse?'':'下次复习 '+fmtDate(wp.sm2.due)}</span>`;
+  const dueLabel=!browse&&due?`<span class="next-due due">⚡ ${wp.sm2.total?'复习到期':'首次学习待进行'}</span>`:`<span class="next-due ${st==='mastered'&&!browse?'ok':''}">${st==='mastered'&&!browse?'🏆 熟练 · ':''}${browse?'题库条目':'下次复习 '+fmtDate(wp.sm2.due)}</span>`;
   return `<div class="wp-card ${selected?'selected':''} ${!browse&&due?'is-due':''}" tabindex="0" role="button" aria-label="${esc(wp.title)}" onclick="App.cardClick('${wp.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();App.cardClick('${wp.id}')}">
     <div class="sel-check"></div>
     <div class="wp-top"><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>${starsHTML(wp.difficulty)}${!browse&&st==='due'?'<span class="badge" style="background:rgba(244,63,94,.12);color:#f43f5e">待复习</span>':''}${!browse&&st==='mastered'?'<span class="badge" style="background:rgba(16,185,129,.12);color:#10b981">已熟练</span>':''}</div>
     <div class="wp-title">${esc(wp.title)}</div>
+    ${wp.source?`<div class="wp-src" title="题目来源">📌 ${esc(wp.source)}</div>`:''}
     ${wp.description?`<div class="wp-desc">${esc(wp.description)}</div>`:''}
     <div class="wp-attach"><span>📝 试题 <b>${hasQText?qc+' 页 + 文字':qc+' 页'}</b></span><span>✅ 答案 <b>${hasAText?ac+' 页 + 文字':ac+' 页'}</b></span><span>${browse?'📖 浏览模式':'🔁 复习 <b>'+(wp.sm2.total||0)+'</b> 次 · 间隔 <b>'+(wp.sm2.ivl?fmtIvl(wp.sm2.ivl):'新卡')+'</b>'}</span></div>
     <div><div class="wp-meta" style="margin-bottom:5px"><span>掌握度</span><b style="color:var(--primary)">${m}%</b></div><div class="pbar"><div class="pbar-fill" style="width:${m}%"></div></div></div>
@@ -1513,7 +1657,7 @@ function reviewItemHTML(wp,compact){
   const dueTxt=overdue?`逾期 ${odDays} 天`:(wp.sm2.due<=todayEnd()?'📌 今天到期':fmtFull(wp.sm2.due));
   return `<div class="review-item ${overdue?'overdue':''}">
     <button class="rv-check" title="完成复习并自评" aria-label="完成复习并自评" onclick="App.openGradeModal('${wp.id}')">✓</button>
-    <div class="rv-info"><div class="rv-title">${esc(wp.title)}<span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span><span class="rv-stage">${isNew?'🆕 首次学习':`第 ${wp.sm2.total+1} 次 · 间隔 ${fmtIvl(wp.sm2.ivl)} · EF ${wp.sm2.ef.toFixed(2)}`}</span></div>
+    <div class="rv-info"><div class="rv-title">${esc(wp.title)}<span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>${wp.source?`<span class="badge" style="background:rgba(6,182,212,.12);color:var(--accent)">📌 ${esc(wp.source)}</span>`:''}<span class="rv-stage">${isNew?'🆕 首次学习':`第 ${wp.sm2.total+1} 次 · 间隔 ${fmtIvl(wp.sm2.ivl)} · EF ${wp.sm2.ef.toFixed(2)}`}</span></div>
     ${!compact&&wp.description?`<div class="rv-sub">${esc(wp.description.slice(0,70))}${wp.description.length>70?'…':''}</div>`:''}</div>
     <span class="rv-due ${overdue?'':'future'}">${dueTxt}</span>
     <button class="mini-btn" aria-label="详情" onclick="App.openDetail('${wp.id}')">👁</button></div>`;
@@ -1538,7 +1682,7 @@ function renderStats(){
     {l:'1–3 天',t:w=>!isNewCard(w)&&w.sm2.ivl<=3,c:'#60a5fa'},
     {l:'4–7 天',t:w=>w.sm2.ivl>=4&&w.sm2.ivl<=7,c:'#34d399'},
     {l:`8–${MATURE_IVL-1} 天`,t:w=>w.sm2.ivl>=8&&w.sm2.ivl<MATURE_IVL,c:'#fbbf24'},
-    {l:`≥${MATURE_IVL} 天·熟练`,t:w=>w.sm2.ivl>=MATURE_IVL,c:'#f472b6'}
+    {l:`≥${MATURE_IVL} 天·熟练`,t:isMature,c:'#f472b6'}
   ];
   const counts=defs.map(d=>DB.weakPoints.filter(d.t).length);
   const maxI=Math.max(1,...counts);
@@ -1587,15 +1731,53 @@ async function resetSchedule(id){
   toast('🔁 已重置为初始状态，今天重新开始学习','success');
 }
 
-function buildStarInput(){ const box=document.getElementById('starInput'); box.innerHTML=[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${i<=ui.difficulty}" aria-label="${i} 星" class="${i<=ui.difficulty?'on':''}" onclick="App.setDifficulty(${i})">${i<=ui.difficulty?'★':'☆'}</button>`).join(''); }
-function openEditModal(id){
+/* 修复 P3-5：星级输入支持键盘方向键切换（roving tabindex），仅当前选中星可 Tab 聚焦 */
+function buildStarInput(){ const box=document.getElementById('starInput'); box.innerHTML=[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${i<=ui.difficulty}" aria-label="${i} 星" class="${i<=ui.difficulty?'on':''}" tabindex="${i===ui.difficulty?'0':'-1'}" onclick="App.setDifficulty(${i})">${i<=ui.difficulty?'★':'☆'}</button>`).join(''); }
+document.addEventListener('keydown',e=>{
+  const box=document.getElementById('starInput');
+  if(!box||!box.contains(e.target)||e.target.getAttribute('role')!=='radio') return;
+  const keys={'ArrowRight':1,'ArrowLeft':-1,'ArrowUp':1,'ArrowDown':-1};
+  if(keys[e.key]!==undefined){
+    e.preventDefault();
+    const next=Math.min(5,Math.max(1,ui.difficulty+keys[e.key]));
+    App.setDifficulty(next); buildStarInput();
+    const btn=[...box.children].find(b=>+b.getAttribute('aria-label').replace(' 星','')===next);
+    if(btn) btn.focus();
+  } else if(e.key==='Home'){ e.preventDefault(); App.setDifficulty(1); buildStarInput(); box.firstChild&&box.firstChild.focus(); }
+  else if(e.key==='End'){ e.preventDefault(); App.setDifficulty(5); buildStarInput(); box.lastChild&&box.lastChild.focus(); }
+});
+function refreshSourceDatalist(){
+  const dl=document.getElementById('sourceList');
+  if(!dl) return;
+  const freq={};
+  DB.weakPoints.forEach(wp=>{ if(wp.source && wp.source.trim()){ const s=wp.source.trim(); freq[s]=(freq[s]||0)+1; } });
+  const list=Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,50);
+  dl.innerHTML=list.map(s=>`<option value="${esc(s)}"></option>`).join('');
+}
+function refreshSourceQuick(){
+  const freq={};
+  DB.weakPoints.forEach(wp=>{ if(wp.source&&wp.source.trim()){ const s=wp.source.trim(); freq[s]=(freq[s]||0)+1; } });
+  const list=Object.keys(freq).sort((a,b)=>freq[b]-freq[a]).slice(0,8);
+  const row=document.getElementById('sourceQuickRow'), box=document.getElementById('sourceQuick');
+  if(!list.length){ if(row)row.style.display='none'; return; }
+  if(row)row.style.display='block';
+  /* 修复 P0-4：彻底不用内联 onclick + 字符串拼接，走 JS 值赋值，杜绝属性上下文 XSS */
+  box.innerHTML=list.map(s=>`<button type="button" class="chip">${esc(s)}</button>`).join('');
+  [...box.children].forEach((b,i)=>b.addEventListener('click',()=>{
+    document.getElementById('f-source').value=list[i];
+  }));
+}
+async function openEditModal(id){
   ui.editingId=id||null;
+  refreshSourceDatalist(); refreshSourceQuick();
   const catSel=document.getElementById('f-category');
   catSel.innerHTML=Object.keys(CATEGORIES).map(c=>`<option value="${c}">${catOf(c).icon} ${c}</option>`).join('');
   if(id){
     const wp=DB.weakPoints.find(w=>w.id===id); if(!wp) return;
+    await hydrateWP(wp);   /* 修复 P0-5：按需加载该条目附件 */
     document.getElementById('editModalTitle').textContent='✏️ 编辑薄弱点';
     document.getElementById('f-title').value=wp.title; catSel.value=wp.category;
+    document.getElementById('f-source').value=wp.source||'';
     document.getElementById('f-desc').value=wp.description||'';
     document.getElementById('f-qtext').value=wp.questionText||'';
     document.getElementById('f-atext').value=wp.answerText||'';
@@ -1605,6 +1787,7 @@ function openEditModal(id){
     document.getElementById('editModalTitle').textContent='📝 录入薄弱点';
     document.getElementById('f-title').value=''; document.getElementById('f-desc').value='';
     document.getElementById('f-qtext').value=''; document.getElementById('f-atext').value='';
+    document.getElementById('f-source').value='';
     ui.difficulty=3; draft={questions:[],answers:[]};
   }
   LATEX_PAIRS.forEach(([,pv])=>{const b=document.getElementById(pv);b.classList.remove('show');b.innerHTML='';});
@@ -1620,7 +1803,9 @@ function saveWeakPoint(){
   try{
     const title=document.getElementById('f-title').value.trim();
     if(!title){ toast('请填写薄弱点标题','error'); _savingLocked=false; return; }
-    const data={title,category:document.getElementById('f-category').value,difficulty:ui.difficulty,
+    const data={title,category:document.getElementById('f-category').value,
+      source:document.getElementById('f-source').value.trim(),
+      difficulty:ui.difficulty,
       description:document.getElementById('f-desc').value.trim(),
       questionText:document.getElementById('f-qtext').value.trim(),
       answerText:document.getElementById('f-atext').value.trim(),
@@ -1660,11 +1845,14 @@ function renderDraftThumbs(){
   const render=(bucket,elId,cntId)=>{
     const files=draft[bucket];
     const totalSize=files.reduce((s,f)=>s+fileSize(f),0);
-    document.getElementById(cntId).textContent=files.length?`（${files.length} 个文件 · ${pageCount(files)} 页 · ${fmtBytes(totalSize)}）`:'';
+    document.getElementById(cntId).textContent=files.length?`（${files.length} 个文件 · ${countPages(files)} 页 · ${fmtBytes(totalSize)}）`:'';
     let gi=0;
     document.getElementById(elId).innerHTML=files.map((f,idx)=>{
       const start=gi; gi+=f.type==='pdf'?pdfPages(f).length:1;
-      const inner=f.type==='image'?`<img draggable="false" src="${f.dataUrl}" loading="lazy" onclick="App.openDraftGallery('${bucket}',${start})">`:`<div class="pdf-cover" onclick="App.openDraftGallery('${bucket}',${start})"><span class="big">📕</span><span>PDF</span><span>${pdfPages(f).length} 页</span></div>`;
+      /* 修复缺陷 D：缺失附件渲染"⚠️ 数据缺失"占位块，而非崩溃留空 */
+      const inner=f.missing
+        ? `<div class="pdf-cover missing" title="附件数据缺失，请删除后重新上传" onclick="App.removeDraft('${bucket}','${f.id}')"><span class="big">⚠️</span><span>数据缺失</span><span>请重新上传</span></div>`
+        : (f.type==='image'?`<img draggable="false" alt="试题附件 ${esc(f.name)}" src="${f.dataUrl}" loading="lazy" onclick="App.openDraftGallery('${bucket}',${start})">`:`<div class="pdf-cover" onclick="App.openDraftGallery('${bucket}',${start})"><span class="big">📕</span><span>PDF</span><span>${pdfPages(f).length} 页</span></div>`);
       return `<div class="thumb" draggable="true" data-bucket="${bucket}" data-idx="${idx}" title="${esc(f.name)}${f.srcPages&&f.srcPages!==f.pageCount?`（原 ${f.srcPages} 页，导入 ${f.pageCount} 页）`:''} · 拖拽可排序">${inner}<span class="ord">${idx+1}</span><span class="sz">${fmtBytes(fileSize(f))}</span><div class="ops">${f.type==='image'?`<button title="编辑（滤镜/标注/裁切）" aria-label="编辑" onclick="event.stopPropagation();App.openImageEditor('${bucket}','${f.id}')">🎨</button><button title="旋转 90°" aria-label="旋转" onclick="event.stopPropagation();App.rotateDraft('${bucket}','${f.id}')">↻</button>`:`<button title="PDF 编辑" aria-label="PDF编辑" onclick="event.stopPropagation();App.openPdfEditor('${bucket}','${f.id}')">📝</button>`}<button title="重命名" aria-label="重命名" onclick="event.stopPropagation();App.renameDraft('${bucket}','${f.id}')">✏️</button><button class="del" title="删除" aria-label="删除" onclick="event.stopPropagation();App.removeDraft('${bucket}','${f.id}')">✕</button></div></div>`;
     }).join('');
   };
@@ -1692,12 +1880,14 @@ async function handleFiles(input,bucket){
   const files=[...(input.files||[])];
   input.value='';
   if(!files.length) return;
+  pdfAbandonAll=false;   /* 修复 P1-3：每批开始时复位（唯一复位点） */
   let imgN=0;
   for(const file of files){
+    if(pdfAbandonAll) break;   /* 修复 P1-3：尊重放弃指令 */
     try{
       if(file.type.startsWith('image/')){
         const f=await processImage(file);
-        draft[bucket].push(f); pendingBlobIds.add(f.id); imgN++;
+        draft[bucket].push(f); markPending(f); imgN++;
       } else if(file.type==='application/pdf'){
         if(typeof pdfjsLib==='undefined'){ toast('PDF 组件未加载（需要联网加载 pdf.js）','error'); continue; }
         toast(`⏳ 正在读取 PDF：${file.name} …`,'info',1500);
@@ -1731,12 +1921,25 @@ function processImage(file){
     reader.readAsDataURL(file);
   });
 }
+/* 修复 P0-6：PDF 渲染画布上限保护，避免超限时 canvas 返回全白页 */
+function safeScale(page, want){
+  try{
+    const v = page.getViewport({scale:1});
+    const area = v.width * v.height;
+    const cap = Math.min(
+      Math.sqrt(MAX_CANVAS_PIXELS / area),
+      4096 / Math.max(v.width, v.height)
+    );
+    return Math.max(0.5, Math.min(want, cap));
+  }catch(_){ return want; }
+}
 async function bytesToPages(bytes,scale){
   const doc=await pdfjsLib.getDocument({data:bytes}).promise;
   const pages=[];
   for(let i=1;i<=doc.numPages;i++){
     const page=await doc.getPage(i);
-    const vp=page.getViewport({scale});
+    const s=safeScale(page,scale);
+    const vp=page.getViewport({scale:s});
     const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
     const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
     await page.render({canvasContext:ctx,viewport:vp}).promise;
@@ -1747,12 +1950,12 @@ async function bytesToPages(bytes,scale){
 }
 let pdfQueue=[],pendingPdf=null,pdfAbandonAll=false;
 function openNextPdf(){
-  if(pdfQueue.length) pdfAbandonAll=false;   /* ★ 修复：放弃队列后可继续导入 */
+  /* 修复 P1-2/P1-3：有窗口在等决策时不打断；放弃指令只在 handleFiles 每批开始处复位 */
+  if(pendingPdf) return;
   if(pdfAbandonAll){ closePdfModalCancelAll(); return; }
   if(!pdfQueue.length){ document.getElementById('pdfModal').classList.remove('open'); return; }
   pendingPdf=pdfQueue[0]; const p=pendingPdf;
   document.getElementById('pdfInfo').innerHTML=`📕 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span><span style="margin-left:auto;flex:none;color:var(--text2);font-weight:600">共 ${p.numPages} 页${pdfQueue.length>1?` · 队列剩余 ${pdfQueue.length-1} 个`:''}</span>`;
-  document.getElementById('pdf-range').value='';
   document.getElementById('pdf-scale').value=ui.upload.pdfScale;
   pdfEstUpdate(); document.getElementById('pdfModal').classList.add('open');
 }
@@ -1765,8 +1968,8 @@ function parsePageRange(str,n){
   str.split(/[,，、\s]+/).forEach(p=>{
   const m=p.match(/^(\d+)\s*[-–~]\s*(\d+)$/);
   if(m){let a=+m[1],b=+m[2];if(a>b)[a,b]=[b,a];for(let i=a;i<=b;i++)if(i>=1&&i<=n)set.add(i);}
-  else if(/^\d+\s*[-–~]$/.test(p)){ const a=+p.replace(/[-–~]$/,''); for(let i=a;i<=n;i++) set.add(i); }   /* ★ 1- 到末尾 */
-  else if(/^[-–~]\s*\d+$/.test(p)){ const b=+p.replace(/^[-–~]/,''); for(let i=1;i<=b;i++) set.add(i); }        /* ★ -5 从开头到5 */
+  else if(/^\d+\s*[-–~]$/.test(p)){ const a=+p.replace(/[-–~]$/,''); for(let i=a;i<=n;i++) set.add(i); }
+  else if(/^[-–~]\s*\d+$/.test(p)){ const b=+p.replace(/^[-–~]/,''); for(let i=1;i<=b;i++) set.add(i); }
   else if(/^\d+$/.test(p)){const v=+p;if(v>=1&&v<=n)set.add(v);}
 });
   return [...set].sort((a,b)=>a-b);
@@ -1778,17 +1981,17 @@ async function confirmPdfImport(){
   if(!nums.length){ toast('页面范围无效，请检查格式（如 1-3,5）','error'); return; }
   if(nums.length>60&&!await confirmDialog(`将导入 ${nums.length} 页，会占用较多存储空间，是否继续？`)) return;
   const scale=+document.getElementById('pdf-scale').value;
-  ui.upload.pdfScale=scale; DB.settings.upload=ui.upload; saveDB();
+  ui.upload.pdfScale=scale; DB.settings.upload=ui.upload; queueSave(); updateUploadLabels();
   const p=pendingPdf; const idx=pdfQueue.indexOf(p); if(idx>=0) pdfQueue.splice(idx,1); pendingPdf=null;
   const {doc,name,bucket,numPages,bytesRaw}=p;
   const pages=[];
-  /* ★ UX：PDF 导入进度条 */
   const total=nums.length, prog=document.getElementById('pdfProgress'), bar=document.getElementById('pdfProgBar'), progtxt=document.getElementById('pdfProgTxt');
   prog.style.display='block'; bar.style.width='0%'; progtxt.textContent='0%';
   try{
     for(let k=0;k<nums.length;k++){
       const page=await doc.getPage(nums[k]);
-      const vp=page.getViewport({scale});
+      const s=safeScale(page,scale);
+      const vp=page.getViewport({scale:s});
       const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
       const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
       await page.render({canvasContext:ctx,viewport:vp}).promise;
@@ -1798,22 +2001,21 @@ async function confirmPdfImport(){
     }
     const newFile={id:uid(),type:'pdf',name,pageCount:pages.length,srcPages:numPages,pages};
     if(nums.length===numPages && bytesRaw){ newFile.bytes=u8ToB64(new Uint8Array(bytesRaw)); }
-    draft[bucket].push(newFile); pendingBlobIds.add(newFile.id);
+    draft[bucket].push(newFile); markPending(newFile);
     renderDraftThumbs();
     toast(`📕 已导入 ${pages.length} 页（约 ${fmtBytes(pages.reduce((s,p)=>s+b64len(p),0))}）`,'success',3000);
   }catch(e){ console.error(e); toast('PDF 渲染失败','error'); }
   prog.style.display='none';
   try{ doc.destroy(); }catch(_){}
-  openNextPdf();
-  if(!pdfQueue.length) document.getElementById('pdfModal').classList.remove('open');
+  openNextPdf();   /* openNextPdf 内部已处理队列空时关闭弹窗 */
 }
-async function rotateDraft(bucket,fid){ const f=draft[bucket].find(x=>x.id===fid); if(!f||f.type!=='image') return; try{ const img=await loadImg(f.dataUrl); const cv=document.createElement('canvas');cv.width=img.height;cv.height=img.width;const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.translate(cv.width/2,cv.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(img,-img.width/2,-img.height/2);f.dataUrl=cv.toDataURL('image/jpeg',ui.upload.quality);pendingBlobIds.add(f.id);renderDraftThumbs();toast('↻ 已旋转 90°','success',1200);}catch(e){toast('旋转失败','error');} }
+async function rotateDraft(bucket,fid){ const f=draft[bucket].find(x=>x.id===fid); if(!f||f.type!=='image') return; try{ const img=await loadImg(f.dataUrl); const cv=document.createElement('canvas');cv.width=img.height;cv.height=img.width;const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.translate(cv.width/2,cv.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(img,-img.width/2,-img.height/2);f.dataUrl=cv.toDataURL('image/jpeg',ui.upload.quality);markPending(f);renderDraftThumbs();toast('↻ 已旋转 90°','success',1200);}catch(e){toast('旋转失败','error');} }
 async function renameDraft(bucket,fid){ const f=draft[bucket].find(x=>x.id===fid); if(!f) return; const name=await inputDialog('✏️ 重命名附件',f.name); if(name&&name.trim()){ f.name=name.trim(); renderDraftThumbs(); } }
-async function clearDraft(bucket){ if(!draft[bucket].length) return; if(!await confirmDialog(`确定清空「${bucket==='questions'?'试题':'答案'}」全部 ${draft[bucket].length} 个附件吗？`)) return; draft[bucket].forEach(f=>pendingBlobIds.delete(f.id)); draft[bucket]=[]; renderDraftThumbs(); }
+async function clearDraft(bucket){ if(!draft[bucket].length) return; if(!await confirmDialog(`确定清空「${bucket==='questions'?'试题':'答案'}」全部 ${draft[bucket].length} 个附件吗？`)) return; draft[bucket].forEach(f=>unmarkPending(f.id)); draft[bucket]=[]; renderDraftThumbs(); }
 async function removeDraft(bucket,fid){   /* ★ UX：删除附件加确认 */
   const f=draft[bucket].find(x=>x.id===fid); if(!f) return;
   if(!await confirmDialog(`确定删除附件「${f.name}」吗？`)) return;
-  pendingBlobIds.delete(fid); draft[bucket]=draft[bucket].filter(x=>x.id!==fid); renderDraftThumbs();
+  unmarkPending(fid); draft[bucket]=draft[bucket].filter(x=>x.id!==fid); renderDraftThumbs();
 }
 async function exportBucket(bucket){
   const files=draft[bucket];
@@ -1860,8 +2062,9 @@ function edPushHistory(){
   edMarkDirty();
   const ac=document.getElementById('edCanvasAnno');
   e.history=e.history.slice(0,e.hIdx+1);
-  e.history.push({base:e.base.toDataURL('image/png'),anno:ac.toDataURL('image/png')});
-  if(e.history.length>20) e.history.shift();
+  /* 修复 P2-3：历史栈用 JPEG 压缩 + 降低栈深，避免 20 份全尺寸 PNG 常驻堆（约 200MB+） */
+  e.history.push({base:e.base.toDataURL('image/jpeg',.82),anno:ac.toDataURL('image/jpeg',.82)});
+  if(e.history.length>8) e.history.shift();
   e.hIdx=e.history.length-1;
   edSyncUndoBtns();
 }
@@ -1941,12 +2144,14 @@ function closeImageEditor(){   /* ★ UX：未保存修改关闭前确认 */
   if(_imgDirty && !confirm('有未保存的修改，确定关闭「图片编辑器」吗？')) return;
   document.getElementById('editImgModal').classList.remove('open'); imgEdit=null; _imgDirty=false;
 }
+let _edToken = 0;
 function edUndo(){ const e=imgEdit; if(!e||e.hIdx<=0) return; e.hIdx--; edRestoreHistory(); }
 function edRedo(){ const e=imgEdit; if(!e||e.hIdx>=e.history.length-1) return; e.hIdx++; edRestoreHistory(); }
 function edRestoreHistory(){
   const en=imgEdit.history[imgEdit.hIdx];
+  const my=++_edToken;   /* 修复 P1-8：版本校验，丢弃过期结果 */
   Promise.all([loadImg(en.base),loadImg(en.anno)]).then(([b,a])=>{
-    if(!imgEdit) return;
+    if(!imgEdit || my!==_edToken) return;
     imgEdit.base=canvasFromImg(b);
     imgEdit.filters={brightness:0,contrast:0,saturation:0,gray:0}; syncFilterSliders();
     const ac=document.getElementById('edCanvasAnno');
@@ -2091,7 +2296,7 @@ function edApplyCrop(){
   toast('✂️ 已裁切','success',1300);
 }
 /* --- 标注 --- */
-function edAnnoPush(){ const e=imgEdit; if(!e) return; edMarkDirty(); e.annoStack.push(document.getElementById('edCanvasAnno').toDataURL('image/png')); if(e.annoStack.length>25) e.annoStack.shift(); edUpdateInfo(); }
+function edAnnoPush(){ const e=imgEdit; if(!e) return; edMarkDirty(); e.annoStack.push(document.getElementById('edCanvasAnno').toDataURL('image/jpeg',.82)); if(e.annoStack.length>12) e.annoStack.shift(); edUpdateInfo(); }
 function edAnnoUndo(){
   const e=imgEdit; if(!e) return;
   if(!e.annoStack.length){ toast('没有可撤销的标注','warn'); return; }
@@ -2273,8 +2478,11 @@ function edStrokeEnd(){
   window.addEventListener('pointerup',()=>_pan=null);
   window.addEventListener('keydown',e=>{
     if(e.code==='Space' && document.getElementById('editImgModal').classList.contains('open')
-       && !e.target.closest('input,textarea,select') && !e.target.closest('button')){
-      _spaceHeld=true; e.preventDefault();
+       && !e.target.closest('input,textarea,select')){
+      /* 修复 P1-11：preventDefault 阻止按钮被空格激活，无需排除 button；并 blur 当前按钮避免焦点卡死 */
+      e.preventDefault();
+      if(document.activeElement && document.activeElement.tagName==='BUTTON') document.activeElement.blur();
+      _spaceHeld=true;
       stage.style.cursor='grab'; ac.style.cursor='grab';
     }
   });
@@ -2284,6 +2492,7 @@ function edStrokeEnd(){
       stage.style.cursor=''; ac.style.cursor='';
     }
   });
+  window.addEventListener('blur',()=>{ _spaceHeld=false; _pan=null; stage.style.cursor=''; ac.style.cursor=''; });
 })();
 function edComposite(){
   _bakeFilters();
@@ -2298,7 +2507,7 @@ function edSaveInPlace(){   /* ★ UX：保存防重复锁 */
   _imgSavingLocked=true;
   const f=draft[e.bucket].find(x=>x.id===e.fid);
   if(!f){ toast('原附件已不存在','error'); closeImageEditor(); _imgSavingLocked=false; return; }
-  f.dataUrl=edComposite(); pendingBlobIds.add(f.id);
+  f.dataUrl=edComposite(); markPending(f);
   _imgDirty=false;
   renderDraftThumbs(); closeImageEditor(); toast('💾 已就地覆盖保存','success');
   setTimeout(()=>_imgSavingLocked=false,500);
@@ -2311,7 +2520,7 @@ function edSaveAsNew(){   /* ★ UX：保存防重复锁 */
   if(!f){ toast('原附件已不存在','error'); closeImageEditor(); _imgSavingLocked=false; return; }
   const copy={id:uid(),type:'image',name:(f.name||'图片').replace(/(\.[^.]+)?$/,m=>m?'_编辑'+m:'_编辑.png'),dataUrl:edComposite()};
   const arr=draft[e.bucket]; arr.splice(arr.findIndex(x=>x.id===e.fid)+1,0,copy);
-  pendingBlobIds.add(copy.id);
+  markPending(copy);
   _imgDirty=false;
   renderDraftThumbs(); closeImageEditor(); toast('💾 已另存为新附件','success');
   setTimeout(()=>_imgSavingLocked=false,500);
@@ -2324,7 +2533,7 @@ function renderPdfThumbs(){
   const box=document.getElementById('peThumbs');
   box.innerHTML=pdfEdit.thumbs.map((src,i)=>{
     const rot=pdfEdit.rot[i]||0;
-    return `<div class="pe-thumb ${pdfEdit.sel.has(i)?'sel':''}" data-idx="${i}" ${rot?`data-rot="r"`:''} title="第 ${i+1} 页（点击选中 · Shift 连选 · 拖拽排序）"><img src="${src}" style="transform:rotate(${rot}deg)"><span class="pn">${i+1}</span>${rot?`<span class="rot">↻${rot}°</span>`:''}</div>`;
+    return `<div class="pe-thumb ${pdfEdit.sel.has(i)?'sel':''}" data-idx="${i}" ${rot?`data-rot="r"`:''} title="第 ${i+1} 页（点击选中 · Shift 连选 · 拖拽排序）"><img alt="PDF 第 ${i+1} 页缩略图" src="${src}" style="transform:rotate(${rot}deg)"><span class="pn">${i+1}</span>${rot?`<span class="rot">↻${rot}°</span>`:''}</div>`;
   }).join('');
   const info=document.getElementById('peInfo');
   if(info) info.textContent=`${pdfEdit.file.name} · 共 ${pdfEdit.thumbs.length} 页 · 已选 ${pdfEdit.sel.size} 页 · ${pdfEdit.file.bytes?'可完整编辑':'（无原始数据，将按页面重建）'}`;
@@ -2386,8 +2595,9 @@ async function peMove(dir){
   if(!idxs.length){ toast('请先选中页面','warn'); return; }
   const n=pdfEdit.rot.length;
   const order=[...Array(n).keys()];
-  if(dir<0){ if(idxs[0]===0){ toast('已在最前','warn'); return; } for(const i of idxs){ [order[i-1],order[i]]=[order[i],order[i-1]]; } }
-  else { if(idxs[idxs.length-1]===n-1){ toast('已在最后','warn'); return; } for(const i of [...idxs].reverse()){ [order[i+1],order[i]]=[order[i],order[i+1]]; } }
+  /* 修复 P1-12：非连续选择时仅当全部所选页都在边界才拒绝移动 */
+  if(dir<0){ if(idxs.every(i=>i===0)){ toast('已在最前','warn'); return; } for(const i of idxs){ if(i===0) continue; [order[i-1],order[i]]=[order[i],order[i-1]]; } }
+  else { if(idxs.every(i=>i===n-1)){ toast('已在最后','warn'); return; } for(const i of [...idxs].reverse()){ if(i===n-1) continue; [order[i+1],order[i]]=[order[i],order[i+1]]; } }
   await peApplyOrder(order);
 }
 async function peInsertBlank(){
@@ -2453,6 +2663,9 @@ async function peApplyCrop(){
   if(!s||s.w<20||s.h<20){ toast('请先在预览页上框选裁切区域','warn'); return; }
   const canvas=document.getElementById('peCropCanvas');
   const page=pdfEdit.pdfDoc.getPage(pdfEdit.cropIdx);
+  /* 修复 P1-6 止损：页面自带旋转时坐标系已偏移，禁用裁切避免裁错区域 */
+  const rot=((page.getRotation().angle%360)+360)%360;
+  if(rot!==0){ toast('⚠️ 该页带有旋转（'+rot+'°），裁切坐标会错位。请先「展平旋转」或改用图片编辑器','error',5000); peCancelCrop(); return; }
   const size=page.getSize();
   const ppx=canvas.width/size.width, ppy=canvas.height/size.height;
   const x0=s.x/ppx, w=s.w/ppx, h=s.h/ppy, yTop=s.y/ppy;
@@ -2486,22 +2699,28 @@ async function peWatermark(){
   const pos=document.getElementById('peWmPos').value;
   const size=+document.getElementById('peWmSize').value;
   if(type==='text'&&!text){ toast('请先输入水印文字','warn'); return; }
-  const font=await pdfEdit.pdfDoc.embedFont(P().StandardFonts.Helvetica);
-  const nd=pdfEdit.rot.length;
-  const pages=pdfEdit.pdfDoc.getPages();
-  for(let i=0;i<pages.length;i++){
-    const p=pages[i],sz=p.getSize();
-    const label=type==='page'?String(i+1)+' / '+nd:text;
-    let x,y=sz.height/2,rot=P().degrees(0);
-    if(pos==='center'&&type==='text'){ x=sz.width/2; rot=P().degrees(-45); }
-    else if(pos==='tl'){ x=30;y=sz.height-30; }
-    else if(pos==='tr'){ x=sz.width-30;y=sz.height-30; }
-    else if(pos==='bl'){ x=30;y=30; }
-    else if(pos==='br'){ x=sz.width-30;y=30; }
-    else { x=sz.width/2; }
-    p.drawText(label,{ x, y, size, font, color:P().rgb(0,0,0), opacity:type==='text'?.16:.55, rotate:rot });
+  /* 修复 P1-5：内置标准字体不支持中文，非 ASCII 直接报错并给出指引，避免静默失败 */
+  if(type==='text' && !/^[\x20-\x7E]*$/.test(text)){
+    toast('⚠️ 内置标准字体不支持中文。请使用英文/数字水印，或改用「页码」','error',5000); return;
   }
-  toast(type==='page'?'🔢 已添加页码':'💧 已添加文字水印','success',1400);
+  try{
+    const font=await pdfEdit.pdfDoc.embedFont(P().StandardFonts.Helvetica);
+    const nd=pdfEdit.rot.length;
+    const pages=pdfEdit.pdfDoc.getPages();
+    for(let i=0;i<pages.length;i++){
+      const p=pages[i],sz=p.getSize();
+      const label=type==='page'?String(i+1)+' / '+nd:text;
+      let x,y=sz.height/2,rot=P().degrees(0);
+      if(pos==='center'&&type==='text'){ x=sz.width/2; rot=P().degrees(-45); }
+      else if(pos==='tl'){ x=30;y=sz.height-30; }
+      else if(pos==='tr'){ x=sz.width-30;y=sz.height-30; }
+      else if(pos==='bl'){ x=30;y=30; }
+      else if(pos==='br'){ x=sz.width-30;y=30; }
+      else { x=sz.width/2; }
+      p.drawText(label,{ x, y, size, font, color:P().rgb(0,0,0), opacity:type==='text'?.16:.55, rotate:rot });
+    }
+    toast(type==='page'?'🔢 已添加页码':'💧 已添加文字水印','success',1400);
+  }catch(e){ console.error(e); toast('水印添加失败：'+(e.message||'未知错误'),'error'); }
 }
 /* --- 压缩 --- */
 async function peStructCompress(){
@@ -2520,18 +2739,19 @@ async function peRasterCompress(){
     const bytes=await pdfEdit.pdfDoc.save();
     const doc=await pdfjsLib.getDocument({data:bytes}).promise;
     const newDoc=await P().PDFDocument.create();
-    const pt=72/dpi;
     for(let i=1;i<=doc.numPages;i++){
       const page=await doc.getPage(i);
       const vp=page.getViewport({scale:1});
-      const wPx=Math.round(vp.width*dpi/72), hPx=Math.round(vp.height*dpi/72);
+      /* 修复 P1-4：vp 已是 PDF 点（1/72 英寸），不再乘 72/dpi，否则 A4 缩成半张纸 */
+      const s=safeScale(page,dpi/72);
+      const wPx=Math.round(vp.width*s), hPx=Math.round(vp.height*s);
       const cv=document.createElement('canvas');cv.width=wPx;cv.height=hPx;
       const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
-      await page.render({canvasContext:ctx,viewport:page.getViewport({scale:dpi/72})}).promise;
+      await page.render({canvasContext:ctx,viewport:page.getViewport({scale:s})}).promise;
       const jpg=await new Promise(res=>cv.toBlob(res,'image/jpeg',q));
       const img=await newDoc.embedJpg(await jpg.arrayBuffer());
-      const np=newDoc.addPage([vp.width*pt,vp.height*pt]);
-      np.drawImage(img,{x:0,y:0,width:vp.width*pt,height:vp.height*pt});
+      const np=newDoc.addPage([vp.width,vp.height]);
+      np.drawImage(img,{x:0,y:0,width:vp.width,height:vp.height});
       if(i%3===0) toast(`⏳ 重渲染 ${i}/${doc.numPages} 页…`,'info',800);
     }
     pdfEdit.pdfDoc=newDoc;
@@ -2548,9 +2768,11 @@ async function peRasterCompress(){
 function fillMergeSelect(){
   if(!pdfEdit) return;
   const sel=document.getElementById('peMergeFiles');
+  const prev=sel.value;   /* 修复 P1-12：保留用户已选中的待合并 PDF */
   const others=draft[pdfEdit.bucket].filter(f=>f.type==='pdf'&&f.id!==pdfEdit.fid);
   sel.innerHTML='<option value="">— 选择要合并的其它 PDF —</option>'+(others.length?others.map(f=>`<option value="${f.id}">${esc(f.name)}（${pdfPages(f).length} 页）</option>`).join(''):'<option value="">（当前无其它 PDF 可合并）</option>');
   sel.disabled=!others.length;
+  if(prev && others.some(f=>f.id===prev)) sel.value=prev;
 }
 async function peMerge(){
   if(!pdfEdit) return;
@@ -2586,7 +2808,7 @@ async function peSplit(){
     const newFile={id:uid(),type:'pdf',name:(pdfEdit.file.name||'PDF').replace(/(\.pdf)?$/i,'')+'_拆分.pdf',pageCount:rendered.count,srcPages:rendered.count,pages:rendered.pages,bytes:u8ToB64(out)};
     const arr=draft[pdfEdit.bucket];
     arr.splice(arr.findIndex(x=>x.id===pdfEdit.fid)+1,0,newFile);
-    pendingBlobIds.add(newFile.id);
+    markPending(newFile);
     renderDraftThumbs();
     toast(`✂️ 已拆分为新附件（${rendered.count} 页）`,'success',1600);
   }catch(e){ console.error(e); toast('拆分失败','error'); }
@@ -2642,15 +2864,14 @@ async function openPdfEditor(bucket,fid){
     if(f.bytes){ baseBytes=b64ToU8(f.bytes); }
     else { const doc=await buildPdfFromImages(pdfPages(f),150); baseBytes=await doc.save(); }
     const pdfDoc=await P().PDFDocument.load(baseBytes);
-    pdfEdit={bucket,fid,file:f,pdfDoc,baseBytes,thumbs:pdfPages(f).slice(),rot:[],sel:new Set(),cropMode:false,cropIdx:-1,cropSel:null};
+    pdfEdit={bucket,fid,file:f,pdfDoc,baseBytes,thumbs:[],rot:[],sel:new Set(),cropMode:false,cropIdx:-1,cropSel:null};
     peLastIdx=-1;
     const n=pdfDoc.getPageCount();
-    if(pdfEdit.thumbs.length!==n){
-      const r=await bytesToPages(await pdfDoc.save(),.28);
-      pdfEdit.thumbs=r.pages;
-    }
+    /* 修复 P2-4：统一用低分辨率真缩略图，避免全分辨率页图当 84px 缩略图导致内存爆炸 */
+    const r=await bytesToPages(await pdfDoc.save(),.28);
+    pdfEdit.thumbs=r.pages;
     pdfEdit.rot=new Array(n).fill(0);
-    pdfEdit.pdfDoc.getPages().forEach((p,i)=>{ const ang=p.getRotation().angle; pdfEdit.rot[i]=ang||0; });
+    /* 修复 P1-7：pdf.js 渲染缩略图时已应用 /Rotate，rot 只表示本次会话新增的相对旋转，初值恒为 0 */
     renderPdfThumbs();
   }catch(e){ console.error(e); toast('PDF 加载失败','error'); closePdfEditor(); }
 }
@@ -2674,7 +2895,7 @@ async function peSave(){
     if(!f){ toast('原附件已不存在','error'); closePdfEditor(); return; }
     const rendered=await bytesToPages(out,ui.upload.pdfScale);
     f.pages=rendered.pages; f.pageCount=rendered.count; f.srcPages=rendered.count; f.bytes=u8ToB64(out);
-    pendingBlobIds.add(f.id);
+    markPending(f);
     renderDraftThumbs(); closePdfEditor();
     toast('💾 已保存 PDF 修改（含原始字节，可继续编辑）','success',2200);
   }catch(e){ console.error(e); toast('保存失败','error'); }
@@ -2686,7 +2907,7 @@ async function peSaveAsNew(){
     const rendered=await bytesToPages(out,ui.upload.pdfScale);
     const copy={id:uid(),type:'pdf',name:(pdfEdit.file.name||'PDF').replace(/(\.pdf)?$/i,'')+'_编辑.pdf',pageCount:rendered.count,srcPages:rendered.count,pages:rendered.pages,bytes:u8ToB64(out)};
     const arr=draft[pdfEdit.bucket]; arr.splice(arr.findIndex(x=>x.id===pdfEdit.fid)+1,0,copy);
-    pendingBlobIds.add(copy.id); renderDraftThumbs(); closePdfEditor();
+    markPending(copy); renderDraftThumbs(); closePdfEditor();
     toast('💾 已另存为新 PDF 附件','success',1800);
   }catch(e){ console.error(e); toast('另存失败','error'); }
 }
@@ -2715,12 +2936,13 @@ function filePagesHTML(files,bucketKey){
   const gal=ui.detailGalleries[bucketKey]=[];
   return files.map(f=>{
     const head=`<div class="file-block-title">${f.type==='pdf'?'📕':'🖼️'} ${esc(f.name)}${f.type==='pdf'?`（共 ${pdfPages(f).length} 页）`:''}</div>`;
-    const imgs=(f.type==='pdf'?pdfPages(f):[f.dataUrl]).map((src,i)=>{const gi=gal.length;gal.push(src);return `${f.type==='pdf'?`<div class="pdf-page-label">第 ${i+1} / ${pdfPages(f).length} 页</div>`:''}<img class="embed-img" src="${src}" loading="lazy" onclick="App.openDetailGallery('${bucketKey}',${gi})">`;}).join('');
+    const imgs=(f.type==='pdf'?pdfPages(f):[f.dataUrl]).map((src,i)=>{const gi=gal.length;gal.push(src);return `${f.type==='pdf'?`<div class="pdf-page-label">第 ${i+1} / ${pdfPages(f).length} 页</div>`:''}<img class="embed-img" alt="${f.type==='pdf'?'试题附件 第 '+(i+1)+' 页':'试题附件 '+esc(f.name)}" src="${src}" loading="lazy" onclick="App.openDetailGallery('${bucketKey}',${gi})">`;}).join('');
     return head+imgs;
   }).join('')||'<p style="font-size:13px;color:var(--text2);padding:4px 0 10px">暂无附件</p>';
 }
-function openDetail(id){
+async function openDetail(id){
   const wp=DB.weakPoints.find(w=>w.id===id); if(!wp) return;
+  await hydrateWP(wp);   /* 修复 P0-5：按需加载该条目附件 */
   ui.detailId=id; ui.detailGalleries={questions:[],answers:[]};
   const browse=isBrowse(), c=catOf(wp.category), m=masteryOf(wp), due=isDue(wp), s=wp.sm2;
   const hasQ=!!(wp.questionText&&wp.questionText.trim()), hasA=!!(wp.answerText&&wp.answerText.trim());
@@ -2728,7 +2950,7 @@ function openDetail(id){
   const histRows=(wp.history||[]).slice(-6).reverse().map(h=>{const g=GRADES[h.g]||GRADES[2];return `<div class="hist-row"><span>${g.ico}</span><b style="color:${g.color}">${g.name}</b><span>${fmtFull(h.at)}</span><span style="margin-left:auto">间隔 → ${fmtIvl(h.ivl)} · EF ${h.ef.toFixed(2)}</span></div>`;}).join('');
   document.getElementById('detailBody').innerHTML=`
     <h2 style="font-size:20px;font-weight:900;line-height:1.4">${esc(wp.title)}</h2>
-    <div class="detail-meta"><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>${starsHTML(wp.difficulty)}<span class="badge" style="background:rgba(79,70,229,.1);color:var(--primary)">掌握度 ${m}%</span>${!browse&&s.ivl>=MATURE_IVL?'<span class="badge" style="background:rgba(16,185,129,.12);color:#10b981">🏆 熟练卡</span>':''}<span class="badge" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">录入 ${fmtFull(wp.createdAt)}</span></div>
+    <div class="detail-meta"><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span>${wp.source?`<span class="badge" style="background:rgba(6,182,212,.12);color:var(--accent)">📌 ${esc(wp.source)}</span>`:''}${starsHTML(wp.difficulty)}<span class="badge" style="background:rgba(79,70,229,.1);color:var(--primary)">掌握度 ${m}%</span>${!browse&&isMature(wp)?'<span class="badge" style="background:rgba(16,185,129,.12);color:#10b981">🏆 熟练卡</span>':''}<span class="badge" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">录入 ${fmtFull(wp.createdAt)}</span></div>
     <div class="pbar" style="margin-bottom:10px"><div class="pbar-fill" style="width:${m}%"></div></div>
     ${!browse?`<div class="form-label">🧠 SM-2 记忆状态</div><div class="sm2-grid">${sm2Cells}</div>
     <p style="font-size:12px;font-weight:700;margin:4px 0 12px;color:${due?'#f43f5e':'var(--text2)'}">${due?'⚡ 现在到期，完成复习后请如实自评':'📅 下次复习：'+fmtFull(s.due)}</p>`:''}
@@ -2740,12 +2962,12 @@ function openDetail(id){
       <button class="btn btn-danger" onclick="App.deleteFromDetail('${wp.id}')">🗑️ 删除</button>
     </div>
     ${wp.description?`<div class="form-label">📋 薄弱描述 / 易错分析</div><div class="detail-desc">${esc(wp.description)}</div>`:''}
-    ${hasQ?`<div class="form-label">📝 试题内容（文字）</div><div class="detail-desc">${esc(wp.questionText).replace(/\n/g,'<br>')}</div>`:''}
-    <div class="form-label">📎 试题附件（${pageCount(wp.questions)} 页）</div>${filePagesHTML(wp.questions,'questions')}
-    <div class="form-label" style="margin-top:18px">✅ 答案${hasA?'（文字 + 附件）':''}（${pageCount(wp.answers)} 页）<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="App.toggleAnswerBlur()">👁 显示 / 隐藏答案</button></div>
+    ${hasQ?`<div class="form-label">📝 试题内容（文字）</div><div class="detail-desc">${esc(wp.questionText)}</div>`:''}
+    <div class="form-label">📎 试题附件（${countPages(wp.questions)} 页）</div>${filePagesHTML(wp.questions,'questions')}
+    <div class="form-label" style="margin-top:18px">✅ 答案${hasA?'（文字 + 附件）':''}（${countPages(wp.answers)} 页）<button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="App.toggleAnswerBlur()">👁 显示 / 隐藏答案</button></div>
     <div class="answer-wrap blurred" id="answerWrap">
       <div class="answer-mask"><div style="font-size:34px">🙈</div><button class="btn btn-primary btn-sm" onclick="App.toggleAnswerBlur()">先自测，点击显示答案</button></div>
-      ${hasA?`<div class="answer-text">${esc(wp.answerText).replace(/\n/g,'<br>')}</div>`:''}
+      ${hasA?`<div class="answer-text">${esc(wp.answerText)}</div>`:''}
       ${filePagesHTML(wp.answers,'answers')}
     </div>
     ${!browse&&(wp.history||[]).length?`<div class="form-label" style="margin-top:18px">🕓 复习记录（最近 ${Math.min(6,wp.history.length)} 次）</div>${histRows}`:''}`;
@@ -2768,13 +2990,13 @@ function syncPrintDOM(){ const c=printCfg,$=id=>document.getElementById(id); $('
 function readPrintDOM(){ const $=id=>document.getElementById(id); printCfg={showQ:$('pc-showQ').checked,showA:$('pc-showA').checked,cover:$('pc-cover').checked,coverTitle:$('pc-coverTitle').value.trim()||PRINT_DEFAULTS.coverTitle,answerMode:document.querySelector('input[name=pc-mode]:checked').value,perPage:+document.querySelector('input[name=pc-per]:checked').value,paper:$('pc-paper').value,orient:document.querySelector('input[name=pc-orient]:checked').value,margin:$('pc-margin').value,footer:$('pc-footer').value,gray:$('pc-gray').checked,hdr:{diff:$('pc-h-diff').checked,mastery:$('pc-h-mastery').checked,ivl:$('pc-h-ivl').checked,created:$('pc-h-created').checked,desc:$('pc-h-desc').checked,pdate:$('pc-h-pdate').checked,pageNum:$('pc-h-pagenum').checked}}; }
 let _pvTimer=null,_saveCfgTimer=null;
 function onPrintInput(){ readPrintDOM(); clearTimeout(_pvTimer); _pvTimer=setTimeout(()=>refreshPrintUI(false),200); clearTimeout(_saveCfgTimer); _saveCfgTimer=setTimeout(()=>{DB.settings.print=printCfg;saveDB();},800); }
-function openPrintModal(){ if(!ui.selected.length){ toast('请先勾选需要打印的薄弱点','warn'); return; } syncPrintDOM(); refreshPrintUI(true); document.getElementById('printModal').classList.add('open'); }
+async function openPrintModal(){ if(!ui.selected.length){ toast('请先勾选需要打印的薄弱点','warn'); return; } toast('⏳ 正在加载打印内容…','info',900); try{ await Promise.all(getPrintItems().map(hydrateWP)); }catch(e){ console.warn('打印前附件加载失败',e); } syncPrintDOM(); refreshPrintUI(true); document.getElementById('printModal').classList.add('open'); }
 function closePrintModal(){ document.getElementById('printModal').classList.remove('open'); restoreSelection(); }
 function restoreSelection(){ if(ui.selBackup){ ui.selected=ui.selBackup; ui.selBackup=null; updateSelBar(); } }
 const getPrintItems=()=>ui.selected.map(id=>DB.weakPoints.find(w=>w.id===id)).filter(Boolean);
 function moveSel(i,dir){ const j=i+dir; if(j<0||j>=ui.selected.length) return; [ui.selected[i],ui.selected[j]]=[ui.selected[j],ui.selected[i]]; refreshPrintUI(true); }
 function unselect(id){ ui.selected=ui.selected.filter(x=>x!==id); updateSelBar(); refreshPrintUI(true); }
-function pqListHTML(){ const items=getPrintItems(); if(!items.length) return '<p style="font-size:12.5px;color:var(--text2);padding:4px 2px">队列为空，请到薄弱点库勾选条目</p>'; return items.map((wp,i)=>{const c=catOf(wp.category);return `<div class="pq-item"><span class="pq-num">${i+1}</span><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span><span class="pq-t" title="${esc(wp.title)}">${esc(wp.title)}</span><span class="pq-c">📝${pageCount(wp.questions)} ✅${pageCount(wp.answers)}</span><span class="pq-ops"><button class="mini-btn" ${i===0?'disabled':''} title="上移" aria-label="上移" onclick="App.moveSel(${i},-1)">↑</button><button class="mini-btn" ${i===items.length-1?'disabled':''} title="下移" aria-label="下移" onclick="App.moveSel(${i},1)">↓</button><button class="mini-btn del" title="移出队列" aria-label="移出队列" onclick="App.unselect('${wp.id}')">✕</button></span></div>`;}).join(''); }
+function pqListHTML(){ const items=getPrintItems(); if(!items.length) return '<p style="font-size:12.5px;color:var(--text2);padding:4px 2px">队列为空，请到薄弱点库勾选条目</p>'; return items.map((wp,i)=>{const c=catOf(wp.category);return `<div class="pq-item"><span class="pq-num">${i+1}</span><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span><span class="pq-t" title="${esc(wp.title)}">${esc(wp.title)}</span><span class="pq-c">📝${countPages(wp.questions)} ✅${countPages(wp.answers)}</span><span class="pq-ops"><button class="mini-btn" ${i===0?'disabled':''} title="上移" aria-label="上移" onclick="App.moveSel(${i},-1)">↑</button><button class="mini-btn" ${i===items.length-1?'disabled':''} title="下移" aria-label="下移" onclick="App.moveSel(${i},1)">↓</button><button class="mini-btn del" title="移出队列" aria-label="移出队列" onclick="App.unselect('${wp.id}')">✕</button></span></div>`;}).join(''); }
 function slotsOf(wp,label){ const isQ=label==='试题'; const files=isQ?wp.questions:wp.answers; const txt=(isQ?wp.questionText:wp.answerText)||''; const slots=[]; const imgs=[]; files.forEach(f=>f.type==='pdf'?imgs.push(...pdfPages(f)):imgs.push(f.dataUrl)); if(txt.trim()) slots.push({wp,label,type:'text',text:txt}); imgs.forEach(src=>slots.push({wp,label,type:'img',src})); slots.forEach((s,i)=>{s.idx=i+1;s.total=slots.length;}); return slots; }
 function textTooLongForGrid(slot,perPage){ if(slot.type!=='text') return false; const capacity=perPage===1?2800:perPage===2?400:180; return slot.text.length>capacity; }
 function assemblePrint(){
@@ -2789,9 +3011,9 @@ function assemblePrint(){
 }
 function pageDims(){ const sizes={A4:[210,297],A5:[148,210],Letter:[216,279]}; let [w,h]=sizes[printCfg.paper]||sizes.A4; if(printCfg.orient==='landscape')[w,h]=[h,w]; const m={narrow:8,std:12,wide:18}[printCfg.margin]??12; return {w,h,m}; }
 function footHTML(num,N,abs){ const parts=[]; if(printCfg.footer&&printCfg.footer.trim())parts.push(esc(printCfg.footer.trim())); if(printCfg.hdr.pageNum)parts.push(`第 ${num} / ${N} 页`); if(!parts.length)return ''; return `<div class="pp-foot${abs?' div-foot':''}">${parts.join(' · ')}</div>`; }
-function richHeadHTML(s){ const wp=s.wp,c=catOf(wp.category),h=printCfg.hdr,parts=[]; if(h.diff)parts.push(`难度 ${'★'.repeat(wp.difficulty)}${'☆'.repeat(5-wp.difficulty)}`); if(h.mastery)parts.push(`掌握度 ${masteryOf(wp)}%`); if(h.ivl)parts.push(`记忆间隔 ${wp.sm2.ivl?fmtIvl(wp.sm2.ivl):'新卡'} · 已复习 ${wp.sm2.total||0} 次`); if(h.created)parts.push(`录入于 ${fmtFull(wp.createdAt)}`); const now=new Date(); const dateStr=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`; return `<div class="pp-head"><div class="pp-row1"><span class="pp-cat" style="color:${c.color}">【${esc(wp.category)}】</span><span class="pp-title">${esc(wp.title)}</span><span class="pp-tag">${s.label} · 第 ${s.idx} / ${s.total} 页</span></div>${parts.length?`<div class="pp-meta">${parts.join(' ｜ ')}</div>`:''}${h.desc&&wp.description?`<div class="pp-desc">📋 ${esc(wp.description)}</div>`:''}${h.pdate?`<div class="pp-date">🖨️ 打印日期：${dateStr}　｜　下次复习：${fmtFull(wp.sm2.due)}（SM-2 · EF ${wp.sm2.ef.toFixed(2)}）</div>`:''}</div>`; }
-function coverHTML(items,num,N){ const qs=items.reduce((n,w)=>n+(printCfg.showQ?pageCount(w.questions):0),0); const as=items.reduce((n,w)=>n+(printCfg.showA?pageCount(w.answers):0),0); const now=new Date(); const ds=`${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日`; const list=items.map((wp,i)=>{const c=catOf(wp.category);return `<div class="cov-item"><span class="cov-num">${String(i+1).padStart(2,'0')}</span><span class="cov-cat" style="color:${c.color}">${esc(wp.category)}</span><span class="cov-t">${esc(wp.title)}</span><span class="cov-m">${'★'.repeat(wp.difficulty)} · ${masteryOf(wp)}% · ${wp.sm2.ivl?fmtIvl(wp.sm2.ivl):'新卡'}</span></div>`;}).join(''); return `<div class="cov"><div class="cov-band"><div class="cov-title">${esc(printCfg.coverTitle)}</div><div class="cov-sub">物竞天择 · 个性化薄弱点强化 · ${ds}</div><div class="cov-stats"><span>📚 薄弱点 ${items.length} 个</span><span>📝 试题 ${qs} 页</span><span>✅ 答案 ${as} 页</span><span>📄 本册共 ${N} 页</span></div></div><div class="cov-list" style="${items.length>10?'columns:2;':''}">${list}</div>${footHTML(num,N)}</div>`; }
-function buildPageHTML(page,num,N,extra=''){ const {w,h,m}=pageDims(); const base=`width:${w}mm;height:${h}mm;padding:${m}mm;${extra}`; if(page.type==='cover')return `<div class="print-page" style="${base}">${coverHTML(page.items,num,N)}</div>`; if(page.type==='divider')return `<div class="print-page div-page" style="${base}"><div class="div-ico">✅</div><div class="div-t">参考答案</div><div class="div-s">请先独立完成试题，再对照答案批改与自评</div>${footHTML(num,N,true)}</div>`; if(page.type==='textpage'){ const s=page.slot; const autoBase=`width:${w}mm;min-height:${h}mm;padding:${m}mm;${extra}`; return `<div class="print-page page-auto" style="${autoBase}">${richHeadHTML(s)}<div class="pp-textpage-body">${esc(s.text).replace(/\n/g,'<br>')}</div>${footHTML(num,N)}</div>`; } if(printCfg.perPage===1){ const s=page.slots[0]; if(s.type==='text'){ const autoBase=`width:${w}mm;min-height:${h}mm;padding:${m}mm;${extra}`; return `<div class="print-page page-auto" style="${autoBase}">${richHeadHTML(s)}<div class="pp-textpage-body">${esc(s.text).replace(/\n/g,'<br>')}</div>${footHTML(num,N)}</div>`; } return `<div class="print-page" style="${base}">${richHeadHTML(s)}<div class="pp-body"><img src="${s.src}"></div>${footHTML(num,N)}</div>`; } const gridStyle=printCfg.perPage===2?(printCfg.orient==='portrait'?'grid-template-rows:repeat(2,1fr)':'grid-template-columns:repeat(2,1fr)'):'grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)'; return `<div class="print-page" style="${base}"><div class="pp-grid" style="${gridStyle}">${page.slots.map(s=>{const c=catOf(s.wp.category);return `<div class="pp-slot"><div class="pp-cap"><span style="color:${c.color}">【${esc(s.wp.category)}】</span>${esc(s.wp.title)} · ${s.label} ${s.idx}/${s.total}</div><div class="pp-imgw">${s.type==='text'?`<div class="pptext">${esc(s.text).replace(/\n/g,'<br>')}</div>`:`<img src="${s.src}">`}</div></div>`;}).join('')}</div>${footHTML(num,N)}</div>`; }
+function richHeadHTML(s){ const wp=s.wp,c=catOf(wp.category),h=printCfg.hdr,parts=[]; if(h.diff)parts.push(`难度 ${'★'.repeat(wp.difficulty)}${'☆'.repeat(5-wp.difficulty)}`); if(h.mastery)parts.push(`掌握度 ${masteryOf(wp)}%`); if(h.ivl)parts.push(`记忆间隔 ${wp.sm2.ivl?fmtIvl(wp.sm2.ivl):'新卡'} · 已复习 ${wp.sm2.total||0} 次`); if(h.created)parts.push(`录入于 ${fmtFull(wp.createdAt)}`); if(wp.source)parts.push(`来源：${esc(wp.source)}`); const now=new Date(); const dateStr=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`; return `<div class="pp-head"><div class="pp-row1"><span class="pp-cat" style="color:${c.color}">【${esc(wp.category)}】</span><span class="pp-title">${esc(wp.title)}</span><span class="pp-tag">${s.label} · 第 ${s.idx} / ${s.total} 页</span></div>${parts.length?`<div class="pp-meta">${parts.join(' ｜ ')}</div>`:''}${h.desc&&wp.description?`<div class="pp-desc">📋 ${esc(wp.description)}</div>`:''}${h.pdate?`<div class="pp-date">🖨️ 打印日期：${dateStr}　｜　下次复习：${fmtFull(wp.sm2.due)}（SM-2 · EF ${wp.sm2.ef.toFixed(2)}）</div>`:''}</div>`; }
+function coverHTML(items,num,N){ const qs=items.reduce((n,w)=>n+(printCfg.showQ?countPages(w.questions):0),0); const as=items.reduce((n,w)=>n+(printCfg.showA?countPages(w.answers):0),0); const now=new Date(); const ds=`${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日`; const list=items.map((wp,i)=>{const c=catOf(wp.category);return `<div class="cov-item"><span class="cov-num">${String(i+1).padStart(2,'0')}</span><span class="cov-cat" style="color:${c.color}">${esc(wp.category)}</span><span class="cov-t">${esc(wp.title)}</span>${wp.source?`<span class="cov-m" style="color:var(--accent)">📌 ${esc(wp.source)}</span>`:''}<span class="cov-m">${'★'.repeat(wp.difficulty)} · ${masteryOf(wp)}% · ${wp.sm2.ivl?fmtIvl(wp.sm2.ivl):'新卡'}</span></div>`;}).join(''); return `<div class="cov"><div class="cov-band"><div class="cov-title">${esc(printCfg.coverTitle)}</div><div class="cov-sub">物竞天择 · 个性化薄弱点强化 · ${ds}</div><div class="cov-stats"><span>📚 薄弱点 ${items.length} 个</span><span>📝 试题 ${qs} 页</span><span>✅ 答案 ${as} 页</span><span>📄 本册共 ${N} 页</span></div></div><div class="cov-list" style="${items.length>10?'columns:2;':''}">${list}</div>${footHTML(num,N)}</div>`; }
+function buildPageHTML(page,num,N,extra=''){ const {w,h,m}=pageDims(); const base=`width:${w}mm;height:${h}mm;padding:${m}mm;${extra}`; if(page.type==='cover')return `<div class="print-page" style="${base}">${coverHTML(page.items,num,N)}</div>`; if(page.type==='divider')return `<div class="print-page div-page" style="${base}"><div class="div-ico">✅</div><div class="div-t">参考答案</div><div class="div-s">请先独立完成试题，再对照答案批改与自评</div>${footHTML(num,N,true)}</div>`; if(page.type==='textpage'){ const s=page.slot; const autoBase=`width:${w}mm;min-height:${h}mm;padding:${m}mm;${extra}`; return `<div class="print-page page-auto" style="${autoBase}">${richHeadHTML(s)}<div class="pp-textpage-body">${esc(s.text)}</div>${footHTML(num,N)}</div>`; } if(printCfg.perPage===1){ const s=page.slots[0]; if(s.type==='text'){ const autoBase=`width:${w}mm;min-height:${h}mm;padding:${m}mm;${extra}`; return `<div class="print-page page-auto" style="${autoBase}">${richHeadHTML(s)}<div class="pp-textpage-body">${esc(s.text)}</div>${footHTML(num,N)}</div>`; } return `<div class="print-page" style="${base}">${richHeadHTML(s)}<div class="pp-body"><img src="${s.src}"></div>${footHTML(num,N)}</div>`; } const gridStyle=printCfg.perPage===2?(printCfg.orient==='portrait'?'grid-template-rows:repeat(2,1fr)':'grid-template-columns:repeat(2,1fr)'):'grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)'; return `<div class="print-page" style="${base}"><div class="pp-grid" style="${gridStyle}">${page.slots.map(s=>{const c=catOf(s.wp.category);return `<div class="pp-slot"><div class="pp-cap"><span style="color:${c.color}">【${esc(s.wp.category)}】</span>${esc(s.wp.title)} · ${s.label} ${s.idx}/${s.total}</div><div class="pp-imgw">${s.type==='text'?`<div class="pptext">${esc(s.text)}</div>`:`<img src="${s.src}">`}</div></div>`;}).join('')}</div>${footHTML(num,N)}</div>`; }
 function refreshPrintUI(rebuildQueue){ const plan=assemblePrint(); document.getElementById('printGo').innerHTML=`🖨️ 打印（${plan.total} 页）`; document.getElementById('printGo').disabled=!plan.total; document.getElementById('pqCount').textContent=`${ui.selected.length} 项`; if(rebuildQueue){document.getElementById('printList').innerHTML=pqListHTML();typeset(document.getElementById('printList'));} document.getElementById('pvStats').innerHTML=`📄 共 <b>${plan.total}</b> 页 · ${printCfg.paper} ${printCfg.orient==='portrait'?'纵向':'横向'} · 每页 ${printCfg.perPage} 图/文${plan.total>8?' · 预览前 8 页':''}`; renderPrintPreview(plan); }
 function renderPrintPreview(plan){ const {w,h}=pageDims(); const pxMM=96/25.4; const scale=Math.min(.62,340/(w*pxMM),520/(h*pxMM)); const box=document.getElementById('printPreview'); box.classList.toggle('gray-imgs',printCfg.gray); const pages=plan.pages.slice(0,8); box.innerHTML=pages.map((p,i)=>{const extra=`transform:scale(${scale});transform-origin:top left;pointer-events:none;`;return `<div class="pv-wrap" style="width:${(w*pxMM*scale).toFixed(1)}px;height:${(h*pxMM*scale).toFixed(1)}px">${buildPageHTML(p,i+1,plan.total,extra)}</div>`;}).join('')||`<div style="color:#cbd5e1;font-size:13px;padding:60px 0;text-align:center">暂无可预览页面<br><span style="font-size:11.5px;opacity:.7">请勾选「试题 / 答案」内容，或确认队列中的条目含有内容</span></div>`; typeset(box); }
 function injectPageStyle(){ let st=document.getElementById('pageStyle'); if(!st){st=document.createElement('style');st.id='pageStyle';document.head.appendChild(st);} st.textContent=`@page{size:${printCfg.paper} ${printCfg.orient};margin:0}`; }
@@ -2801,7 +3023,7 @@ function printSingle(id){ ui.selBackup=[...ui.selected]; ui.selected=[id]; openP
 /* ================= 导入 / 数据管理 ================= */
 function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); pendingImport=null; importSel=new Set(); }
 function openImportModal(){ renderImportList(); document.getElementById('importModal').classList.add('open'); }
-function renderImportList(){ const p=pendingImport; if(!p) return; const list=document.getElementById('importList'); list.innerHTML=p.wps.map(wp=>{const c=catOf(wp.category);const att=(wp.questions&&wp.questions.length)+(wp.answers&&wp.answers.length);const hasTxt=(wp.questionText&&wp.questionText.trim())||(wp.answerText&&wp.answerText.trim());const checked=importSel.has(wp.id)?'checked':'';return `<label class="imp-item"><input type="checkbox" ${checked} onchange="App.toggleImportItem('${wp.id}',this.checked)"><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span><span class="imp-t" title="${esc(wp.title)}">${esc(wp.title)}</span><span class="imp-m">📎${att}${hasTxt?' ✎':''} ${starsHTML(wp.difficulty)} · 掌握度${masteryOf(wp)}%</span></label>`;}).join('')||'<div class="empty" style="padding:20px"><p>没有可导入的内容</p></div>'; updateImportCount(); }
+function renderImportList(){ const p=pendingImport; if(!p) return; const list=document.getElementById('importList'); list.innerHTML=p.wps.map(wp=>{const c=catOf(wp.category);const att=(wp.questions&&wp.questions.length)+(wp.answers&&wp.answers.length);const hasTxt=(wp.questionText&&wp.questionText.trim())||(wp.answerText&&wp.answerText.trim());const checked=importSel.has(wp.id)?'checked':'';return `<label class="imp-item"><input type="checkbox" ${checked} onchange="App.toggleImportItem('${wp.id}',this.checked)"><span class="badge" style="background:${c.color}1f;color:${c.color}">${c.icon} ${esc(wp.category)}</span><span class="imp-t" title="${esc(wp.title)}">${esc(wp.title)}</span><span class="imp-m">${wp.source?`📌${esc(wp.source)} `:''}📎${att}${hasTxt?' ✎':''} ${starsHTML(wp.difficulty)} · 掌握度${masteryOf(wp)}%</span></label>`;}).join('')||'<div class="empty" style="padding:20px"><p>没有可导入的内容</p></div>'; updateImportCount(); }
 function toggleImportItem(id,on){ if(on)importSel.add(id);else importSel.delete(id); updateImportCount(); }
 function importSelectAll(){ if(!pendingImport) return; importSel=new Set(pendingImport.wps.map(w=>w.id)); renderImportList(); }
 function importClearSel(){ importSel=new Set(); renderImportList(); }
@@ -2811,9 +3033,19 @@ async function confirmImport(){
   const mode=document.querySelector('input[name=imp-mode2]:checked').value; const p=pendingImport;
   const selected=p.wps.filter(wp=>importSel.has(wp.id));
   if(!selected.length){toast('请至少勾选一个要导入的条目','warn');return;}
+  /* 修复 P0-3：精简备份覆盖导入会静默销毁现有全部附件，阻断并强制合并 */
+  if(mode==='replace' && p.meta && p.meta.light){
+    toast('⚠️ 这是「精简备份」（不含附件）。覆盖导入将永久删除现有全部附件！已自动切换为「合并」模式','error',9000);
+    const rep=document.querySelector('input[name=imp-mode2][value=replace]');
+    if(rep){ rep.disabled=true; const chip=rep.closest('.chip'); if(chip) chip.style.opacity=.45; }
+    const mg=document.querySelector('input[name=imp-mode2][value=merge]');
+    if(mg) mg.checked=true;
+    return;
+  }
   if(mode==='replace'){
     if(!await confirmDialog(`覆盖导入将清空当前全部 ${DB.weakPoints.length} 个薄弱点，仅导入所选的 ${selected.length} 个，且不可恢复。确定继续？`))return;
     DB.weakPoints=selected; DB.activity=p.activity||{}; if(p.settings&&typeof p.settings==='object')DB.settings=Object.assign({},DB.settings,p.settings);
+    ui.selected=[]; ui.selBackup=null;   /* 修复 P1-12：清空指向已不存在 id 的选择 */
     toast(`📥 覆盖导入完成：${selected.length} 个薄弱点`,'success',3000);
   } else {
     const exist=new Set(DB.weakPoints.map(w=>w.id)); let added=0,skipped=0;
@@ -2821,7 +3053,7 @@ async function confirmImport(){
     Object.keys(p.activity||{}).forEach(k=>{DB.activity[k]=Math.max(DB.activity[k]||0,p.activity[k]);});
     toast(`📥 合并完成：新增 ${added} 个${skipped?`，跳过重复 ${skipped} 个`:''}`,'success',3500);
   }
-  [...allFileIds({weakPoints:selected})].forEach(id=>pendingBlobIds.add(id));
+  selected.forEach(wp => [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => markPending(f)));
   backfillActivity();
   ui.upload=Object.assign({maxRes:1800,quality:.85,pdfScale:2},DB.settings.upload);
   printCfg=normalizePrintCfg(DB.settings.print);
@@ -2832,8 +3064,27 @@ function closeDataModal(){ document.getElementById('dataModal').classList.remove
 function refreshDataModal(){ let att=0,bytes=0,reviews=0; DB.weakPoints.forEach(w=>{att+=(w.questions||[]).length+(w.answers||[]).length;reviews+=w.sm2.total||0;[...(w.questions||[]),...(w.answers||[])].forEach(f=>bytes+=fileSize(f));}); let metaBytes=0;try{metaBytes=JSON.stringify(buildMeta(DB)).length;}catch(e){} document.getElementById('dmStats').innerHTML=[['📚',`${DB.weakPoints.length} 个薄弱点`],['🖼️',`${att} 个附件`],['💾',`附件约 ${fmtBytes(bytes)}`],['🔁',`${reviews} 次复习`]].map(([i,t])=>`<span class="badge" style="background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:6px 12px">${i} ${t}</span>`).join(''); document.getElementById('dmFullSize').textContent='约 '+fmtBytes(bytes+metaBytes); }
 function buildExportPayload(wps,light){ return {meta:{app:'physics-trainer',format:3,light:!!light,exportedAt:Date.now(),count:wps.length},weakPoints:light?wps.map(wp=>({...wp,questions:(wp.questions||[]).map(fileRef).filter(Boolean),answers:(wp.answers||[]).map(fileRef).filter(Boolean)})):wps,activity:DB.activity,settings:DB.settings}; }
 function downloadJSON(obj,name){ const blob=new Blob([JSON.stringify(obj)],{type:'application/json'}); const a=document.createElement('a'); const url=URL.createObjectURL(blob); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),4000); }
-function exportData(mode){ const light=mode==='light'; const heavy=!light&&(()=>{let bytes=0;DB.weakPoints.forEach(w=>[...(w.questions||[]),...(w.answers||[])].forEach(f=>bytes+=fileSize(f)));return bytes;})(); if(heavy>25*1048576){toast(`⚠️ 备份体积较大（约 ${fmtBytes(heavy)}），可能耗时较长。建议改用「精简备份」或分批导出。`,'warn',5000);} downloadJSON(buildExportPayload(DB.weakPoints,light),`物理竞赛备份_${light?'精简_':''}${dateKey()}.json`); toast(light?'📄 精简备份已导出（不含附件，仅保留文字与进度）':'📦 完整备份已导出','success',3000); }
-function exportSelected(){ const wps=getPrintItems(); if(!wps.length){toast('请先勾选条目','warn');return;} downloadJSON(buildExportPayload(wps,false),`物理竞赛备份_精选${wps.length}项_${dateKey()}.json`); toast(`📤 已导出所选 ${wps.length} 项（含附件）`,'success'); }
+async function exportData(mode){
+  const light=mode==='light';
+  const wps=DB.weakPoints;
+  if(!light){
+    toast('⏳ 正在准备完整备份（加载附件）…','info',1500);
+    /* 修复：完整备份前按需加载全部附件，否则导出的 JSON 中附件仅有 id 引用而无内容 */
+    try{ await Promise.all(wps.map(hydrateWP)); }catch(e){ console.warn('备份前附件加载失败',e); }
+  }
+  const heavy=!light&&(()=>{let bytes=0;wps.forEach(w=>[...(w.questions||[]),...(w.answers||[])].forEach(f=>bytes+=fileSize(f)));return bytes;})();
+  if(heavy>25*1048576){toast(`⚠️ 备份体积较大（约 ${fmtBytes(heavy)}），可能耗时较长。建议改用「精简备份」或分批导出。`,'warn',5000);}
+  downloadJSON(buildExportPayload(wps,light),`物理竞赛备份_${light?'精简_':''}${dateKey()}.json`);
+  toast(light?'📄 精简备份已导出（不含附件，仅保留文字与进度）':'📦 完整备份已导出','success',3000);
+}
+async function exportSelected(){
+  const wps=getPrintItems(); if(!wps.length){toast('请先勾选条目','warn');return;}
+  toast('⏳ 正在准备导出…','info',1000);
+  /* 修复：导出前按需加载所选条目附件，避免导出仅有 id 引用的空附件 */
+  try{ await Promise.all(wps.map(hydrateWP)); }catch(e){ console.warn('导出前附件加载失败',e); }
+  downloadJSON(buildExportPayload(wps,false),`物理竞赛备份_精选${wps.length}项_${dateKey()}.json`);
+  toast(`📤 已导出所选 ${wps.length} 项（含附件）`,'success');
+}
 async function handleImportFile(files){ const file=files&&files[0]; if(!file)return; const inp=document.getElementById('importFile2'); if(inp)inp.value=''; let data; try{data=JSON.parse(await file.text());}catch(e){toast('导入失败：不是有效的 JSON 文件','error');return;} const rawWps=Array.isArray(data)?data:data.weakPoints; if(!Array.isArray(rawWps)){toast('导入失败：文件中找不到薄弱点数据','error');return;} let truncated=0; const wps=rawWps.map(migrateWP).map(wp=>{const s=sanitizeWP(wp);['description','questionText','answerText'].forEach(k=>{if(s[k]&&String(wp[k]).length>s[k].length)truncated++;});return s;}); if(truncated)toast(`⚠️ 检测到 ${truncated} 处超长文本（超过 ${MAX_TEXT} 字符）将在导入时截断，请检查源文件`,'warn',4500); const bytes=wps.reduce((s,w)=>s+[...w.questions,...w.answers].reduce((a,f)=>a+fileSize(f),0),0); const when=(data&&data.meta&&data.meta.exportedAt)?fmtFull(data.meta.exportedAt):'未知时间（旧版备份）'; pendingImport={wps,activity:(data&&data.activity)||{},settings:(data&&data.settings)||null,meta:(data&&data.meta)||null,fileName:file.name,bytes}; importSel=new Set(wps.map(w=>w.id)); document.getElementById('impInfo2').innerHTML=`📦 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(file.name)}</span><span style="margin-left:auto;flex:none;color:var(--text2);font-weight:600">共 ${wps.length} 条 · ${when}</span>`; openImportModal(); }
 function cancelImport(){ pendingImport=null; importSel=new Set(); const inp=document.getElementById('importFile2'); if(inp)inp.value=''; }
 
@@ -2868,14 +3119,35 @@ async function clearAllData(){
   try{ if(idbAvailable) await idbClearAll(); }catch(e){ console.warn('清空 IndexedDB 失败',e); }
   try{ localStorage.removeItem(STORE_KEY); }catch(e){}
   DB={weakPoints:[],activity:{},settings:{theme,browseMode}};
-  knownFileIds=new Set(); pendingBlobIds=new Set();
+  knownFileIds=new Set(); pendingBlobs=new Map();
   ui.selected=[]; ui.selBackup=null;
   draft={questions:[],answers:[]};
   await saveDB(); closeDataModal(); renderAll(); toast('🗑️ 全部数据已清空','success');
 }
 
 /* ================= 事件绑定 ================= */
+/* 修复 P3-1：移动端汉堡菜单开合 */
+const _ham=document.getElementById('hamburger'),_hamMask=document.getElementById('sidebarMask'),_sidebarEl=document.getElementById('sidebar');
+function setSidebarOpen(open){
+  if(_sidebarEl) _sidebarEl.classList.toggle('open',open);
+  if(_hamMask) _hamMask.classList.toggle('show',open);
+  if(_ham) _ham.setAttribute('aria-expanded',open?'true':'false');
+  if(_ham) _ham.textContent=open?'✕':'☰';
+}
+if(_ham) _ham.addEventListener('click',()=>setSidebarOpen(!_sidebarEl.classList.contains('open')));
+if(_hamMask) _hamMask.addEventListener('click',()=>setSidebarOpen(false));
+document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>{ if(window.innerWidth<=860) setSidebarOpen(false); }));
+/* 修复 P1-13：全局兜底未捕获的 Promise 拒绝，避免界面零反馈 */
+window.addEventListener('unhandledrejection', e => {
+  console.error('未捕获的 Promise 拒绝', e.reason);
+  toast('⚠️ 操作失败：'+(e.reason?.message||'未知错误'),'error',4000);
+});
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
+/* 修复 P3-6：为 label.chip>input 的选中态同步 .active，兼容不支持 :has() 的旧浏览器 */
+document.querySelectorAll('label.chip input').forEach(inp=>{
+  const sync=()=>{ inp.closest('.chip') && inp.closest('.chip').classList.toggle('active',inp.checked); };
+  inp.addEventListener('change',sync); sync();
+});
 let _prevFocusEl=null;
 const _modalObserver=new MutationObserver(muts=>{
   muts.forEach(m=>{
@@ -2895,8 +3167,12 @@ const _modalObserver=new MutationObserver(muts=>{
       _prevFocusEl=null;
     }
   });
+  /* 修复 P3-4：模态框打开时隔离背景，阻止读屏穿透 */
+  const _app=document.getElementById('app');
+  if(_app) _app.inert = _modalObserver._state.size > 0;
 });
-_modalObserver.observe(document.body,{attributes:true,subtree:true,attributeFilter:['class']});
+/* 修复 P2-1：只观察模态框自身的 class 变化，不再监听整个 body（每次卡片/chip/缩略图 class 切换都产生记录） */
+document.querySelectorAll('.modal-mask').forEach(m=>_modalObserver.observe(m,{attributes:true,attributeFilter:['class']}));
 document.addEventListener('keydown',e=>{
   const top=topmostOpen();
   /* 图片编辑器快捷键：Ctrl+Z 撤销 / Ctrl+Y 重做 / Enter 确认裁切 / Esc 取消裁切 */
@@ -2943,7 +3219,7 @@ window.App={
   closeImportModal,toggleImportItem,importSelectAll,importClearSel,clearAllData,
   openEditModal,closeEditModal,saveWeakPoint,deleteWP,deleteFromDetail,
   setDifficulty:n=>{ui.difficulty=n;buildStarInput();},
-  previewLatex,setUpload,setPasteBucket,exportBucket,
+  previewLatex,setUpload,setPasteBucket,exportBucket,refreshSourceDatalist,refreshSourceQuick,
   handleFiles:(input,b)=>handleFiles(input,b),
   handleDrop:(files,b)=>handleFiles({files,value:''},b),
   removeDraft,rotateDraft,renameDraft,clearDraft,
@@ -2982,16 +3258,30 @@ if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https:
   if(!db||!Array.isArray(db.weakPoints)) db={weakPoints:[],activity:{},settings:{theme:'light'}};
   db.activity=db.activity||{};
   db.settings=db.settings||{theme:'light'};
+  db.schemaVersion=2;   /* 修复 P5-5：显式 schema 版本号，替代仅靠 wp.sm2 判断的一次性迁移 */
   try{ const t=localStorage.getItem(THEME_KEY); if(t==='dark'||t==='light')db.settings.theme=t; }catch(e){}
+  /* 修复 P4-3：加载路径也过结构校验（不校验 base64 正则，仅防御结构损坏/注入） */
+  db.weakPoints=(db.weakPoints||[]).map(wp=>{
+    if(!wp||typeof wp!=='object') return null;
+    return { ...wp, id: OK_ID(wp.id), title:String(OK_STR(wp.title)).slice(0,200), category:CATEGORIES[wp.category]?wp.category:'其他',
+      difficulty:Math.min(5,Math.max(1,+((wp.difficulty)||3))),
+      questions:((wp.questions)||[]).filter(f=>f&&typeof f==='object'&&f.id&&['image','pdf'].includes(f.type)),
+      answers:((wp.answers)||[]).filter(f=>f&&typeof f==='object'&&f.id&&['image','pdf'].includes(f.type)),
+      sm2:{ef:2.5,ivl:0,reps:0,due:Date.now(),total:0,lapses:0,...(wp.sm2||{})} };
+  }).filter(Boolean);
   DB=db;
   DB.weakPoints=DB.weakPoints.map(migrateWP);
   backfillActivity();
   ui.upload=Object.assign({maxRes:1800,quality:.85,pdfScale:2},DB.settings.upload);
   printCfg=normalizePrintCfg(DB.settings.print);
   ui.mode=DB.settings.browseMode?'browse':'study';
-  if(legacy&&idbAvailable){ pendingBlobIds=new Set(allFileIds(DB)); knownFileIds=new Set(allFileIds(DB)); }
+  if(legacy&&idbAvailable){ DB.weakPoints.forEach(wp => [...(wp.questions||[]), ...(wp.answers||[])].forEach(f => markPending(f))); knownFileIds=new Set(allFileIds(DB)); }
   else if(idbMode){ knownFileIds=new Set(allFileIds(DB)); }
-  applyTheme(); applyMode(); renderAll();
+  applyTheme(); applyMode(); renderAll(); await auditIntegrity();
+  /* 修复 P4-1 提示：MathJax 离线未加载时给出明确说明，而非静默降级 */
+  setTimeout(()=>{
+    if (!window.__mjReady) toast('⚠️ MathJax（公式渲染）未加载：可能处于离线状态，LaTeX 公式将显示为源码。联网刷新后即可恢复','warn',6000);
+  }, 4000);
   const mode=await saveDB();
   if(legacy&&mode==='idb'){ try{ localStorage.removeItem(STORE_KEY); }catch(e){} setTimeout(()=>toast('🚀 存储引擎已升级：容量上限由 ~5MB 提升至数百 MB ~ 数 GB（取决于磁盘空间）','success',5000),700); }
   requestPersist(false);
